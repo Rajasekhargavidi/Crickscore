@@ -5,15 +5,24 @@ import { signOut } from "../../store/actions/auth";
 
 const SignedInLinks = ({ auth, signOut, user }) => {
   return (
-    <ul className="right">
-      <li>
-        <NavLink to="/create">New Project</NavLink>
+    <ul className="navbar-nav mr-auto">
+      <li className="nav-item active">
+        <NavLink to="/newMatch" className="nav-link">
+          New Match
+        </NavLink>
       </li>
-      <li>
-        <a onClick={signOut}>Logout</a>
+      <li className="nav-item active">
+        <NavLink to="/matches" className="nav-link">
+          All Matches
+        </NavLink>
       </li>
-      <li>
-        <NavLink to="/" className="btn btn-floating pink lighten-1">
+      <li className="nav-item active">
+        <a onClick={signOut} className="nav-link">
+          Logout
+        </a>
+      </li>
+      <li className="nav-item active">
+        <NavLink to="/" className="btn btn-danger">
           {user && user.initials}
         </NavLink>
       </li>
