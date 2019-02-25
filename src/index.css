@@ -5,9 +5,12 @@ body {
   min-height: 100%;
   margin: 0;
   padding: 0;
-  font-family: "Nunito", sans-serif, sans-serif;
+  font-family: "Nunito", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+.btn {
+  font-family: "Roboto", sans-serif;
 }
 
 form {
@@ -31,11 +34,6 @@ textarea.materialize-textarea:focus:not([readonly]) + label,
 input[type="email"]:not(.browser-default):focus:not([readonly]) + label,
 input[type="password"]:not(.browser-default):focus:not([readonly]) + label {
   color: #ec407a !important;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
 }
 
 /* Custom Stylesheet */
@@ -94,4 +92,43 @@ p {
 
 footer.page-footer {
   margin: 0;
+}
+
+/* bootstrap custom */
+
+.score-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  font-family: "Roboto", sans-serif;
+}
+
+.innings-col {
+  line-height: 55px;
+}
+
+.score-values {
+  font-size: 1.5rem;
+  font-family: "Roboto", sans-serif;
+}
+.border-right {
+  border-right: 1px dashed #6d757c;
+}
+.ball-values {
+  font-size: 1.2rem;
+  font-family: "Roboto", sans-serif;
+}
+.last-ball {
+  border: 1px dashed #0f0;
+}
+.current-run {
+  border: 1px solid #6d757c;
+  border-radius: 60px;
+  vertical-align: middle !important;
+  width: 35px !important;
+  display: inline-block;
+  text-align: center;
+}
+
+.border-needed {
+  border: solid 1px #6d757c;
 }

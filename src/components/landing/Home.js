@@ -7,12 +7,10 @@ class Home extends Component {
   render() {
     return (
       <div className="">
-        <div id="index-banner" className="parallax-container">
-          <div className="section no-pad-bot">
+        <div id="index-banner" className="container">
+          <div className="section p-0">
             <div className="container">
-              <h1 className="header center teal-text text-lighten-2">
-                Parallax Template
-              </h1>
+              <h1 className="header center text-danger">Parallax Template</h1>
               <div className="row center">
                 <h5 className="header col s12 light">
                   A modern responsive front-end framework based on Material
@@ -30,12 +28,13 @@ class Home extends Component {
               </div>
             </div>
           </div>
-          <div className="parallax">
+          <div className="container">
             <img
               src={
                 "https://images.unsplash.com/photo-1542187533940-b54e17c5b4e9"
               }
               alt="Unsplashed background img 1"
+              className="img-fluid"
             />
           </div>
         </div>
@@ -95,7 +94,7 @@ class Home extends Component {
           </div>
         </div>
 
-        <div className="parallax-container valign-wrapper">
+        <div className="container valign-wrapper">
           <div className="section no-pad-bot">
             <div className="container">
               <div className="row center">
@@ -111,6 +110,7 @@ class Home extends Component {
               src={
                 "https://images.unsplash.com/photo-1542187533940-b54e17c5b4e9"
               }
+              className="img-fluid"
               alt="Unsplashed background img 2"
             />
           </div>
@@ -159,6 +159,7 @@ class Home extends Component {
                 "https://images.unsplash.com/photo-1542187533940-b54e17c5b4e9"
               }
               alt="Unsplashed background img 3"
+              className="img-fluid"
             />
           </div>
         </div>

@@ -9,6 +9,8 @@ import AddPlayers from "./components/matches/AddPlayers";
 import Console from "./components/scorecard/Console";
 import FullScorecard from "./components/scorecard/FullScorecard";
 import AddPlayer from "./components/scorecard/AddPlayer";
+import AddBowler from "./components/scorecard/AddBowler";
+import AddBatsman from "./components/scorecard/AddBatsman";
 import SignIn from "./components/auth/Signin";
 import SignUp from "./components/auth/SignUp";
 
@@ -28,6 +30,8 @@ class App extends Component {
             <Route path="/match/:matchId/scorecard" component={FullScorecard} />
             <Route path="/match/:matchId/score" component={Console} />
             <Route path="/match/:matchId/addPlayer" component={AddPlayer} />
+            <Route path="/match/:matchId/addBowler" component={AddBowler} />
+            <Route path="/match/:matchId/addBatsman" component={AddBatsman} />
           </Switch>
           <Footer />
         </div>

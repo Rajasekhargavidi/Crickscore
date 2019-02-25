@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import moment from "moment";
 import { connect } from "react-redux";
 import { Redirect } from "react-router-dom";
-import { getTeamPlayers, addPlayer } from "../../store/actions/matches";
+import { getTeamPlayers, addPlayers } from "../../store/actions/matches";
 import { compose } from "redux";
 import { firestoreConnect } from "react-redux-firebase";
 import { Typeahead } from "react-bootstrap-typeahead";
@@ -11,22 +11,49 @@ import "react-bootstrap-typeahead/css/Typeahead-bs4.css";
 import { has, startCase, toLower } from "lodash";
 
 class AddPlayer extends Component {
+  state = {
+    striker: {
+      id: "",
+      name: "",
+      teamName: "",
+      teamId: "",
+      onStrike: true,
+      battingOrder: 1
+    },
+    nonStriker: {
+      id: "",
+      name: "",
+      teamName: "",
+      teamId: "",
+      onStrike: true,
+      battingOrder: 2
+    },
+    bowler: {
+      id: "",
+      name: "",
+      teamName: "",
+      teamId: "",
+      onStrike: true,
+      bowlingOrder: 1
+    }
+  };
   handleSubmit = e => {
     e.preventDefault();
-    // this.props.createMatch(this.state);
-    // this.props.history.push("/matches");
+    const { currentMatch } = this.props;
+    const { striker, nonStriker, bowler } = this.state;
+    console.log(striker);
+    console.log(nonStriker);
+    console.log(bowler);
+    this.props.addPlayers(striker, nonStriker, bowler);
+    this.props.history.push(`/match/${currentMatch[0].id}/score`);
   };
 
   componentDidUpdate(previousProps, previousState) {
     const { currentMatch } = this.props;
     if (previousProps.currentMatch !== currentMatch) {
       if (currentMatch) {
-        let teamOneAction =
-          currentMatch[0].batting === "teamOne" ? "batting" : "bowling";
-        let teamTwoAction =
-          currentMatch[0].batting === "teamTwo" ? "batting" : "bowling";
-        this.props.getTeamPlayers(currentMatch[0].teamOneId, teamOneAction);
-        this.props.getTeamPlayers(currentMatch[0].teamTwoId, teamTwoAction);
+        this.props.getTeamPlayers(currentMatch[0].firstBattingId, "batting");
+        this.props.getTeamPlayers(currentMatch[0].firstBowlingId, "bowling");
       }
     }
   }
@@ -36,22 +63,19 @@ class AddPlayer extends Component {
       return <Redirect to="/signIn" />;
     }
     if (currentMatch) {
-      const battingTeam =
-        currentMatch[0].batting === "teamOne"
-          ? currentMatch[0].teamOne
-          : currentMatch[0].teamTwo;
-      const bowlingTeam =
-        currentMatch[0].batting === "teamOne"
-          ? currentMatch[0].teamTwo
-          : currentMatch[0].teamOne;
-      const battingTeamId =
-        currentMatch[0].batting === "teamOne"
-          ? currentMatch[0].teamOneId
-          : currentMatch[0].teamTwoId;
-      const bowlingTeamId =
-        currentMatch[0].batting === "teamOne"
-          ? currentMatch[0].teamTwoId
-          : currentMatch[0].teamOneId;
+      let battingTeam, battingTeamId, bowlingTeam, bowlingTeamId;
+      if (currentMatch[0].currentInnings === "FIRST_INNINGS") {
+        battingTeam = currentMatch[0].firstBatting;
+        battingTeamId = currentMatch[0].firstBattingId;
+        bowlingTeam = currentMatch[0].firstBowling;
+        bowlingTeamId = currentMatch[0].firstBowlingId;
+      }
+      if (currentMatch[0].currentInnings === "SECOND_INNINGS") {
+        battingTeam = currentMatch[0].secondBatting;
+        battingTeamId = currentMatch[0].secondBattingId;
+        bowlingTeam = currentMatch[0].secondBowling;
+        bowlingTeamId = currentMatch[0].secondBowlingId;
+      }
       return (
         <div className="container">
           <form onSubmit={this.handleSubmit} autoComplete="off">
@@ -84,14 +108,22 @@ class AddPlayer extends Component {
                       } else {
                         strikerId = selected[0].id;
                       }
-                      this.props.addPlayer(
-                        startCase(toLower(selected[0].name)),
-                        strikerId,
-                        battingTeamId,
-                        currentMatch[0].id,
-                        "batting",
-                        currentMatch[0].currentInnings
-                      );
+                      this.setState({
+                        striker: {
+                          id: strikerId,
+                          name: startCase(toLower(selected[0].name)),
+                          teamName: battingTeam,
+                          teamId: battingTeamId,
+                          onStrike: true,
+                          battingOrder: 1,
+                          balls: 0,
+                          runs: 0,
+                          dots: 0,
+                          fours: 0,
+                          sixes: 0,
+                          sr: 0
+                        }
+                      });
                     }
                   }}
                   allowNew={true}
@@ -116,14 +148,22 @@ class AddPlayer extends Component {
                       } else {
                         nonStrikerId = selected[0].id;
                       }
-                      this.props.addPlayer(
-                        startCase(toLower(selected[0].name)),
-                        nonStrikerId,
-                        battingTeamId,
-                        currentMatch[0].id,
-                        "batting",
-                        currentMatch[0].currentInnings
-                      );
+                      this.setState({
+                        nonStriker: {
+                          id: nonStrikerId,
+                          name: startCase(toLower(selected[0].name)),
+                          teamName: battingTeam,
+                          teamId: battingTeamId,
+                          onStrike: false,
+                          battingOrder: 2,
+                          balls: 0,
+                          runs: 0,
+                          dots: 0,
+                          fours: 0,
+                          sixes: 0,
+                          sr: 0
+                        }
+                      });
                     }
                   }}
                   allowNew={true}
@@ -150,14 +190,26 @@ class AddPlayer extends Component {
                       } else {
                         bowlerId = selected[0].id;
                       }
-                      this.props.addPlayer(
-                        startCase(toLower(selected[0].name)),
-                        bowlerId,
-                        bowlingTeamId,
-                        currentMatch[0].id,
-                        "bowling",
-                        currentMatch[0].currentInnings
-                      );
+                      this.setState({
+                        bowler: {
+                          id: bowlerId,
+                          name: startCase(toLower(selected[0].name)),
+                          teamName: bowlingTeam,
+                          teamId: bowlingTeamId,
+                          onStrike: true,
+                          bowlingOrder: 1,
+                          balls: 0,
+                          wickets: 0,
+                          wides: 0,
+                          noBalls: 0,
+                          runs: 0,
+                          dots: 0,
+                          byes: 0,
+                          fours: 0,
+                          sixes: 0,
+                          eco: 0.0
+                        }
+                      });
                     }
                   }}
                   allowNew={true}
@@ -198,10 +250,8 @@ const mapDispatchToProps = dispatch => {
   return {
     getTeamPlayers: (teamId, teamAction) =>
       dispatch(getTeamPlayers(teamId, teamAction)),
-    addPlayer: (name, playerId, teamId, matchId, teamAction, currentInnings) =>
-      dispatch(
-        addPlayer(name, playerId, teamId, matchId, teamAction, currentInnings)
-      )
+    addPlayers: (striker, nonStriker, bowler) =>
+      dispatch(addPlayers(striker, nonStriker, bowler))
   };
 };
 

@@ -3,8 +3,12 @@ import moment from "moment";
 import { Link } from "react-router-dom";
 
 const MatchSummary = ({ match }) => {
+  let url =
+    match.statusType === "CREATED"
+      ? `/match/${match.id}/addPlayer`
+      : `/match/${match.id}/score`;
   return (
-    <div className="card">
+    <div className="card mb-2">
       <div className="card-header">
         {match.venue}{" "}
         <span className="float-right">
@@ -19,8 +23,9 @@ const MatchSummary = ({ match }) => {
         </span>
         <div className="card-text">
           <div>
-            {match.batting === "teamOne" ? match.teamOne : match.teamTwo} - Yet
-            to bat
+            {match.batting === "teamOne" ? match.teamOne : match.teamTwo} -{" "}
+            {match.firstInningsRuns} / {match.firstInningsWickets} (
+            {match.firstInningsOvers} overs)
           </div>
           <div>
             {match.batting === "teamOne" ? match.teamTwo : match.teamOne} - Yet
@@ -35,10 +40,7 @@ const MatchSummary = ({ match }) => {
         >
           View Score
         </Link>
-        <Link
-          to={`/match/${match.id}/score`}
-          className="float-right btn btn-primary btn-sm"
-        >
+        <Link to={url} className="float-right btn btn-primary btn-sm">
           Start Scoring
         </Link>
       </div>

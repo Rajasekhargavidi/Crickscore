@@ -7,7 +7,7 @@ import { connect } from "react-redux";
 const Navbar = ({ auth }) => {
   const links = auth.uid ? <SignedInLinks /> : <SignedOutLinks />;
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light">
+    <nav className="navbar navbar-expand-lg navbar-light bg-primary text-white">
       <Link to="/" className="navbar-brand">
         CRIKSCORE
       </Link>

@@ -64,7 +64,7 @@ class CreateMatch extends Component {
           </div>
           <div className="form-group row">
             <label htmlFor="players" className="col-sm-2 col-form-label">
-              Number of Players
+              Number of Players / Team
             </label>
             <div className="col-sm-10">
               <input
@@ -78,7 +78,7 @@ class CreateMatch extends Component {
           </div>
           <div className="form-group row">
             <label htmlFor="overs" className="col-sm-2 col-form-label">
-              Number of Overs
+              Number of Overs / Team
             </label>
             <div className="col-sm-10">
               <input
@@ -155,7 +155,6 @@ class CreateMatch extends Component {
               <div className="col-sm-10">
                 <div className="form-check">
                   <input
-                    required={true}
                     type="radio"
                     className="form-check-input"
                     id="tossTeamOne"
