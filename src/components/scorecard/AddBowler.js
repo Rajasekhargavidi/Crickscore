@@ -200,19 +200,16 @@ class AddBowler extends Component {
 }
 
 const mapStateToProps = state => {
-  console.log(state);
   let currentMatch = state.firestore.ordered.matches;
   let bowlingSquad;
   if (currentMatch) {
     currentMatch = currentMatch[0];
     let teamId = currentMatch.firstBowlingId;
-    if (currentMatch.currentInnings === "SECON_INNINGS") {
+    if (currentMatch.currentInnings === "SECOND_INNINGS") {
       let teamId = currentMatch[0].secondBowlingId;
     }
     bowlingSquad = find(state.firestore.ordered.teams, { id: teamId });
-    console.log(bowlingSquad);
   }
-
   return {
     auth: state.firebase.auth,
     currentMatch: state.firestore.ordered.matches,

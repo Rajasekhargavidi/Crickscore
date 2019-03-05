@@ -10,6 +10,11 @@ export const calculateEco = (runs, balls) => {
   return round((runs * 6) / balls, 2);
 };
 
+export const calculateSR = (runs, balls) => {
+  if (balls === 0) return "NA";
+  return round((runs * 100) / balls);
+};
+
 export const setCart = (value, cartKey = CART_KEY) => {
   console.log(localStorage);
   if (localStorage) {
