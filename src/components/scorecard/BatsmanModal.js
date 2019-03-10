@@ -5,21 +5,21 @@ import "react-bootstrap-typeahead/css/Typeahead.css";
 import "react-bootstrap-typeahead/css/Typeahead-bs4.css";
 import { has, startCase, toLower, find } from "lodash";
 
-class BowlerModal extends React.Component {
+class BatsmanModal extends React.Component {
   constructor(props) {
     super(props);
   }
   state = {
-    bowler: {}
+    batsman: {}
   };
 
   render() {
     const {
       openModal,
       toggle,
-      submitBowler,
+      submitBatsman,
       currentMatch,
-      bowlingSquad
+      battingSquad
     } = this.props;
     return (
       <Modal
@@ -27,35 +27,34 @@ class BowlerModal extends React.Component {
         toggle={toggle}
         className={this.props.className}
       >
-        <ModalHeader toggle={toggle}>Change Bowler</ModalHeader>
+        <ModalHeader toggle={toggle}>Change Batsman</ModalHeader>
         <form
           onSubmit={e => {
-            submitBowler(e, this.state.bowler);
+            submitBatsman(e, this.state.batsman);
           }}
           autoComplete="off"
           className="m-0 p-0"
         >
           <ModalBody>
-            <h5>Bowling Team: {currentMatch.firstBowling}</h5>
+            <h5>Batting Team: {currentMatch.firstBatting}</h5>
             <div className="form-group row">
-              <label htmlFor="bowler" className="col-sm-2 col-form-label">
-                Bowler
+              <label htmlFor="batsman" className="col-sm-2 col-form-label">
+                Batsman
               </label>
               <div className="col-sm-10">
                 <Typeahead
                   labelKey="name"
                   onChange={selected => {
-                    
                     if (selected.length) {
-                      let bowlerId;
+                      let batsmanId;
                       if (has(selected[0], "customOption")) {
-                        bowlerId = "";
+                        batsmanId = "";
                       } else {
-                        bowlerId = selected[0].id;
+                        batsmanId = selected[0].id;
                       }
                       this.setState({
-                        bowler: {
-                          id: bowlerId,
+                        batsman: {
+                          id: batsmanId,
                           name: startCase(toLower(selected[0].name)),
                           teamName: currentMatch.firstBowling,
                           teamId: currentMatch.firstBowlingId,
@@ -76,15 +75,15 @@ class BowlerModal extends React.Component {
                     }
                   }}
                   allowNew={true}
-                  options={bowlingSquad !== undefined ? bowlingSquad : []}
+                  options={battingSquad !== undefined ? battingSquad : []}
                   filterBy={["name"]}
-                  placeholder="Choose bowler..."
+                  placeholder="Choose batsman..."
                 />
               </div>
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button color="primary">Change Bowler</Button>{" "}
+            <Button color="primary">Change Batsman</Button>{" "}
             <Button color="secondary" onClick={toggle}>
               Cancel
             </Button>
@@ -95,4 +94,4 @@ class BowlerModal extends React.Component {
   }
 }
 
-export default BowlerModal;
+export default BatsmanModal;

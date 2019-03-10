@@ -93,7 +93,7 @@ export const runsJson = [
     selectedStyle:
       "col current-run bg-success text-white align-middle mx-2 p-1",
     id: "zero",
-    event: "0"
+    event: "."
   },
   {
     run: 1,

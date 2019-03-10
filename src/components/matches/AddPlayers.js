@@ -20,7 +20,7 @@ class AddPlayers extends Component {
   };
   handleSubmit = e => {
     e.preventDefault();
-    console.log(this.state);
+    
     this.props.addPlayers(this.state);
     this.props.history.push("/");
   };
@@ -76,7 +76,7 @@ class AddPlayers extends Component {
 }
 
 const mapStateToProps = state => {
-  console.log(state);
+  
   return {
     auth: state.firebase.auth,
     match: state.matches.currentMatch

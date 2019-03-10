@@ -37,9 +37,9 @@ class AddBatsman extends Component {
       secondInningsScore
     } = this.props;
     const { bowler } = this.state;
-    console.log(bowler);
+    
     var alreadyExists = find(firstInningsBowling, { id: bowler.id });
-    console.log(alreadyExists);
+    
     if (alreadyExists === undefined) {
       this.props.addBowler({
         ...bowler,
@@ -47,8 +47,8 @@ class AddBatsman extends Component {
       });
     } else {
       let scoreCollection = "secondInningsScore";
-      console.log(secondInningsScore);
-      console.log(firstInningsScore);
+      
+      
       let score = secondInningsScore.length && secondInningsScore[0];
       if (currentMatch[0].currentInnings === "FIRST_INNINGS") {
         scoreCollection = "firstInningsScore";
@@ -68,10 +68,10 @@ class AddBatsman extends Component {
 
   componentDidUpdate(previousProps, previousState) {
     const { currentMatch, overCompleted } = this.props;
-    console.log(overCompleted);
-    console.log(previousProps.overCompleted);
+    
+    
     if (previousProps.currentMatch !== currentMatch) {
-      console.log(currentMatch);
+      
       if (currentMatch) {
         if (currentMatch[0].currentInnings === "FIRST_INNINGS") {
           this.props.getTeamPlayers(currentMatch[0].firstBowlingId, "bowling");
@@ -132,7 +132,7 @@ class AddBatsman extends Component {
                 <Typeahead
                   labelKey="name"
                   onChange={selected => {
-                    console.log(selected);
+                    
                     if (selected.length) {
                       let bowlerId;
                       if (has(selected[0], "customOption")) {
@@ -178,7 +178,7 @@ class AddBatsman extends Component {
 }
 
 const mapStateToProps = state => {
-  console.log(state);
+  
   return {
     auth: state.firebase.auth,
     currentMatch: state.firestore.ordered.matches,

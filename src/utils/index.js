@@ -3,10 +3,14 @@ const CART_KEY = "cart";
 const TOKEN_KEY = "jwt";
 
 export const calculateOvers = balls => {
-  return `${floor(balls / 6)}.${balls % 6}`;
+  let overs = floor(balls / 6);
+  let localBalls = balls % 6;
+  localBalls = localBalls === 0 ? "" : `.${localBalls}`;
+  return `${overs}${localBalls}`;
 };
 export const calculateEco = (runs, balls) => {
-  if (balls === 0) return 0.0;
+  if (balls === undefined || runs === undefined || balls === 0 || runs === 0)
+    return 0.0;
   return round((runs * 6) / balls, 2);
 };
 
@@ -16,9 +20,7 @@ export const calculateSR = (runs, balls) => {
 };
 
 export const setCart = (value, cartKey = CART_KEY) => {
-  console.log(localStorage);
   if (localStorage) {
-    console.log("local storage");
     localStorage.setItem(cartKey, JSON.stringify(value));
   }
 };

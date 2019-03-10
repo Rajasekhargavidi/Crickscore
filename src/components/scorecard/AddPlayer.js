@@ -41,9 +41,9 @@ class AddPlayer extends Component {
     e.preventDefault();
     const { currentMatch } = this.props;
     const { striker, nonStriker, bowler } = this.state;
-    console.log(striker);
-    console.log(nonStriker);
-    console.log(bowler);
+    
+    
+    
     this.props.addPlayers(striker, nonStriker, bowler);
     this.props.history.push(`/match/${currentMatch[0].id}/score`);
   };
@@ -182,7 +182,7 @@ class AddPlayer extends Component {
                 <Typeahead
                   labelKey="name"
                   onChange={selected => {
-                    console.log(selected);
+                    
                     if (selected.length) {
                       let bowlerId;
                       if (has(selected[0], "customOption")) {
@@ -238,7 +238,7 @@ class AddPlayer extends Component {
 }
 
 const mapStateToProps = state => {
-  console.log(state);
+  
   return {
     auth: state.firebase.auth,
     currentMatch: state.firestore.ordered.matches,

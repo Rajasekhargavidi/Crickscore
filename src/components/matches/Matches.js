@@ -16,7 +16,15 @@ class Matches extends Component {
       <div className="dashboard container">
         <div className="row">
           <div className="col">
-            <h1>Matches</h1>
+            <h1 className="mt-3">
+              Matches{" "}
+              <a
+                className="btn btn-primary btn-sm float-right"
+                href="/newMatch"
+              >
+                New Match
+              </a>
+            </h1>
             <LiveMatches matches={matches} />
           </div>
         </div>
@@ -26,7 +34,7 @@ class Matches extends Component {
 }
 
 const mapStateToProps = state => {
-  console.log(state);
+  
   return {
     matches: state.firestore.ordered.matches,
     auth: state.firebase.auth

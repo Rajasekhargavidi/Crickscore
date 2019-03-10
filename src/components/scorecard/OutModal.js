@@ -1,13 +1,34 @@
 import React from "react";
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
+import {
+  Button,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  FormGroup,
+  Label,
+  Input
+} from "reactstrap";
+import { isEmpty } from "lodash";
 
 class OutModal extends React.Component {
   constructor(props) {
     super(props);
   }
 
+  state = {
+    whoIsOut: {}
+  };
+
   render() {
-    const { openModal, toggle } = this.props;
+    const {
+      openModal,
+      toggle,
+      striker,
+      nonStriker,
+      handleWhoIsOut
+    } = this.props;
+    const { whoIsOut } = this.state;
     return (
       <Modal
         isOpen={openModal}
@@ -16,17 +37,43 @@ class OutModal extends React.Component {
       >
         <ModalHeader toggle={toggle}>Who is out?</ModalHeader>
         <ModalBody>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-          aliquip ex ea commodo consequat. Duis aute irure dolor in
-          reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-          pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-          culpa qui officia deserunt mollit anim id est laborum.
+          <FormGroup tag="fieldset">
+            <legend>Select Batsman</legend>
+            <FormGroup check>
+              <Label check>
+                <Input
+                  type="radio"
+                  name="whoIsOut"
+                  value={striker.id}
+                  onChange={() => {
+                    this.setState({ whoIsOut: striker });
+                  }}
+                />{" "}
+                {striker.name}
+              </Label>
+            </FormGroup>
+            <FormGroup check>
+              <Label check>
+                <Input
+                  type="radio"
+                  name="whoIsOut"
+                  value={nonStriker.id}
+                  onChange={() => {
+                    this.setState({ whoIsOut: nonStriker });
+                  }}
+                />{" "}
+                {nonStriker.name}
+              </Label>
+            </FormGroup>
+          </FormGroup>
         </ModalBody>
         <ModalFooter>
-          <Button color="primary" onClick={toggle}>
-            Do Something
+          <Button
+            color="primary"
+            onClick={() => handleWhoIsOut(whoIsOut)}
+            disabled={isEmpty(whoIsOut)}
+          >
+            Okay
           </Button>{" "}
           <Button color="secondary" onClick={toggle}>
             Cancel

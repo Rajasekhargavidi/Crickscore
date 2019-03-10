@@ -28,7 +28,7 @@ class CreateMatch extends Component {
   };
   handleSubmit = e => {
     e.preventDefault();
-    console.log(this.state);
+    
     this.props.createMatch(this.state);
     this.props.history.push("/matches");
   };
@@ -98,7 +98,7 @@ class CreateMatch extends Component {
               <Typeahead
                 labelKey="name"
                 onChange={selected => {
-                  console.log(selected);
+                  
                   if (selected.length) {
                     let teamOneId;
                     if (has(selected[0], "customOption")) {
@@ -226,7 +226,7 @@ class CreateMatch extends Component {
 }
 
 const mapStateToProps = state => {
-  console.log(state);
+  
   return {
     auth: state.firebase.auth,
     teams: state.firestore.ordered.teams
