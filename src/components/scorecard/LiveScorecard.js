@@ -6,8 +6,8 @@ import { calculateOvers, calculateEco } from "../../utils";
 const LiveScorecard = ({ striker, nonStriker, bowler }) => {
   if (striker && nonStriker && bowler) {
     return (
-      <div className="container mt-3">
-        <table className="table">
+      <React.Fragment>
+        <table className="table table-sm">
           <thead className="thead-dark">
             <tr>
               <th scope="col">Batsman</th>
@@ -38,7 +38,7 @@ const LiveScorecard = ({ striker, nonStriker, bowler }) => {
           </tbody>
         </table>
 
-        <table className="table">
+        <table className="table table-sm">
           <thead className="thead-light">
             <tr>
               <th scope="col">Bowler</th>
@@ -58,7 +58,7 @@ const LiveScorecard = ({ striker, nonStriker, bowler }) => {
             </tr>
           </tbody>
         </table>
-      </div>
+      </React.Fragment>
     );
   } else {
     return (

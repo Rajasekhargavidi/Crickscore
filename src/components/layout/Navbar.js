@@ -7,12 +7,12 @@ import { connect } from "react-redux";
 const Navbar = ({ auth }) => {
   const links = auth.uid ? <SignedInLinks /> : <SignedOutLinks />;
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-primary text-white">
-      <Link to="/" className="navbar-brand">
+    <nav className="navbar navbar-expand-lg navbar-light bg-warning text-white">
+      <Link to="/" className="navbar-brand text-white">
         CRIKSCORE
       </Link>
       <button
-        className="navbar-toggler"
+        className="navbar-toggler text-white"
         type="button"
         data-toggle="collapse"
         data-target="#navbarSupportedContent"

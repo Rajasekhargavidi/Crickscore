@@ -7,7 +7,10 @@ const BallByBall = ({ scores }) => {
       <tbody>
         {scores &&
           scores.map((score, index) => (
-            <tr key={index} className="border-bottom border-success">
+            <tr
+              key={index}
+              className={`border-bottom border-success ball-${score.ball}`}
+            >
               <th scope="row" className="align-middle text-center" width="12%">
                 <span className="border border-primary p-1 d-inline-block w-100">
                   {score.currentOver}

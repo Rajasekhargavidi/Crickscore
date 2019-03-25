@@ -102,10 +102,6 @@ footer.page-footer {
   font-family: "Roboto", sans-serif;
 }
 
-.innings-col {
-  line-height: 55px;
-}
-
 .score-values {
   font-size: 1.5rem;
   font-family: "Roboto", sans-serif;
@@ -131,4 +127,8 @@ footer.page-footer {
 
 .border-needed {
   border: solid 1px #6d757c;
+}
+
+.ball-0 {
+  display: none !important;
 }

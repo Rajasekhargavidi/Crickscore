@@ -3,12 +3,12 @@ import { Table } from "reactstrap";
 
 const InningsBatting = ({ players }) => {
   return (
-    <Table responsive>
+    <Table responsive size="sm">
       <thead>
         <tr>
-          <th colspan="2">Batsman</th>
-          <th>Runs</th>
-          <th>Balls</th>
+          <th colSpan="2">Batsman</th>
+          <th>R</th>
+          <th>B</th>
           <th>4s</th>
           <th>6s</th>
           <th>0s</th>

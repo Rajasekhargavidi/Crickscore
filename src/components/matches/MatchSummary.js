@@ -3,10 +3,7 @@ import moment from "moment";
 import { Link } from "react-router-dom";
 
 const MatchSummary = ({ match }) => {
-  let url =
-    match.statusType === "CREATED"
-      ? `/match/${match.id}/addPlayer`
-      : `/match/${match.id}/score`;
+  let url = `/match/${match.id}/score`;
   return (
     <div className="card mb-2">
       <div className="card-header">

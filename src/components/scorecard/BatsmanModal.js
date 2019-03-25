@@ -18,8 +18,9 @@ class BatsmanModal extends React.Component {
       openModal,
       toggle,
       submitBatsman,
-      currentMatch,
-      battingSquad
+      battingSquad,
+      battingTeam,
+      battingTeamId
     } = this.props;
     return (
       <Modal
@@ -36,7 +37,7 @@ class BatsmanModal extends React.Component {
           className="m-0 p-0"
         >
           <ModalBody>
-            <h5>Batting Team: {currentMatch.firstBatting}</h5>
+            <h5>Batting Team: {battingTeam}</h5>
             <div className="form-group row">
               <label htmlFor="batsman" className="col-sm-2 col-form-label">
                 Batsman
@@ -56,8 +57,8 @@ class BatsmanModal extends React.Component {
                         batsman: {
                           id: batsmanId,
                           name: startCase(toLower(selected[0].name)),
-                          teamName: currentMatch.firstBowling,
-                          teamId: currentMatch.firstBowlingId,
+                          teamName: battingTeam,
+                          teamId: battingTeamId,
                           onStrike: true,
                           bowlingOrder: 2,
                           balls: 0,

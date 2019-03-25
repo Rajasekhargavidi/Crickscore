@@ -1,16 +1,14 @@
-import React, { Component } from "react";
-import moment from "moment";
-import { connect } from "react-redux";
-import { Redirect } from "react-router-dom";
-import { getTeamPlayers, addPlayers } from "../../store/actions/matches";
-import { compose } from "redux";
-import { firestoreConnect } from "react-redux-firebase";
+import React from "react";
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 import { Typeahead } from "react-bootstrap-typeahead";
 import "react-bootstrap-typeahead/css/Typeahead.css";
 import "react-bootstrap-typeahead/css/Typeahead-bs4.css";
-import { has, startCase, toLower } from "lodash";
+import { has, startCase, toLower, find } from "lodash";
 
-class AddPlayer extends Component {
+class BatsmanModal extends React.Component {
+  constructor(props) {
+    super(props);
+  }
   state = {
     striker: {
       id: "",
@@ -37,59 +35,30 @@ class AddPlayer extends Component {
       bowlingOrder: 1
     }
   };
-  handleSubmit = e => {
-    e.preventDefault();
-    const { currentMatch } = this.props;
-    const { striker, nonStriker, bowler } = this.state;
-    this.props.addPlayers(striker, nonStriker, bowler);
-    this.props.history.push(`/match/${currentMatch[0].id}/score`);
-  };
 
-  componentDidUpdate(previousProps, previousState) {
-    const { currentMatch } = this.props;
-    if (previousProps.currentMatch !== currentMatch) {
-      if (currentMatch) {
-        console.log(currentMatch);
-        this.props.getTeamPlayers(currentMatch[0].firstBattingId, "batting");
-        this.props.getTeamPlayers(currentMatch[0].firstBowlingId, "bowling");
-      }
-    }
-  }
   render() {
-    const { auth, bowlingSquad, battingSquad, currentMatch } = this.props;
-    if (!auth.uid) {
-      return <Redirect to="/signIn" />;
-    }
-    if (currentMatch) {
-      let battingTeam, battingTeamId, bowlingTeam, bowlingTeamId;
-      if (currentMatch[0].currentInnings === "FIRST_INNINGS") {
-        battingTeam = currentMatch[0].firstBatting;
-        battingTeamId = currentMatch[0].firstBattingId;
-        bowlingTeam = currentMatch[0].firstBowling;
-        bowlingTeamId = currentMatch[0].firstBowlingId;
-      }
-      if (currentMatch[0].currentInnings === "SECOND_INNINGS") {
-        battingTeam = currentMatch[0].secondBatting;
-        battingTeamId = currentMatch[0].secondBattingId;
-        bowlingTeam = currentMatch[0].secondBowling;
-        bowlingTeamId = currentMatch[0].secondBowlingId;
-      }
-      return (
-        <div className="container">
-          <form onSubmit={this.handleSubmit} autoComplete="off">
-            <div>
-              <span>{currentMatch[0].currentInnings}</span>
-              <span className="float-right">
-                {moment().format("MMMM Do, h:mm a")}
-              </span>
-            </div>
-            <h5 className="bg-dark text-light p-2">
-              {currentMatch[0].teamOne}
-              {currentMatch[0].toss === "teamOne" ? "(T)" : ""} vs{" "}
-              {currentMatch[0].teamTwo}
-              {currentMatch[0].toss === "teamTwo" ? "(T)" : ""}
-            </h5>
-            <hr />
+    const {
+      openModal,
+      submitInitialPlayers,
+      battingSquad,
+      bowlingSquad,
+      battingTeam,
+      battingTeamId,
+      bowlingTeam,
+      bowlingTeamId
+    } = this.props;
+    const { striker, nonStriker, bowler } = this.state;
+    return (
+      <Modal isOpen={openModal} className={this.props.className}>
+        <ModalHeader>Select Striker, Non Striker and Bowler</ModalHeader>
+        <form
+          onSubmit={e => {
+            submitInitialPlayers(e, striker, nonStriker, bowler);
+          }}
+          autoComplete="off"
+          className="m-0 p-0"
+        >
+          <ModalBody>
             <h5>{battingTeam}</h5>
             <div className="form-group row">
               <label htmlFor="striker" className="col-sm-2 col-form-label">
@@ -216,47 +185,14 @@ class AddPlayer extends Component {
                 />
               </div>
             </div>
-            <div className="form-group row">
-              <div className="col-sm-10">
-                <button className="btn btn-primary">Add Players</button>
-              </div>
-            </div>
-          </form>
-        </div>
-      );
-    } else {
-      return (
-        <div className="container center">
-          <p>Loading Project...</p>
-        </div>
-      );
-    }
+          </ModalBody>
+          <ModalFooter>
+            <Button color="primary">Add Players</Button>{" "}
+          </ModalFooter>
+        </form>
+      </Modal>
+    );
   }
 }
 
-const mapStateToProps = state => {
-  return {
-    auth: state.firebase.auth,
-    currentMatch: state.firestore.ordered.matches,
-    bowlingSquad: state.matches.bowlingSquad,
-    battingSquad: state.matches.battingSquad
-  };
-};
-const mapDispatchToProps = dispatch => {
-  return {
-    getTeamPlayers: (teamId, teamAction) =>
-      dispatch(getTeamPlayers(teamId, teamAction)),
-    addPlayers: (striker, nonStriker, bowler) =>
-      dispatch(addPlayers(striker, nonStriker, bowler))
-  };
-};
-
-export default compose(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  ),
-  firestoreConnect(props => [
-    { collection: "matches", doc: props.match.params.matchId }
-  ])
-)(AddPlayer);
+export default BatsmanModal;

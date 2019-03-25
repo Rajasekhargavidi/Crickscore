@@ -6,20 +6,27 @@ import {
   addScoreToMatch,
   getTeamPlayers,
   addBowler,
-  overStart,
-  overComplete,
   updateScore,
-  addBatsman
+  addBatsman,
+  addPlayers,
+  updateMatch
 } from "../../store/actions/matches";
 import { compose } from "redux";
 import { firestoreConnect } from "react-redux-firebase";
 import { runsJson, extrasJson, outJson } from "../../config/console";
-import { calculateOvers, calculateEco, calculateSR } from "../../utils";
-
+import {
+  calculateOvers,
+  calculateEco,
+  calculateSR,
+  expectedRuns,
+  currentRR,
+  requiredRR
+} from "../../utils";
 import LiveScorecard from "./LiveScorecard";
 import BowlerModal from "./BowlerModal";
 import BatsmanModal from "./BatsmanModal";
 import OutModal from "./OutModal";
+import AddPlayerModal from "./AddPlayerModal";
 
 import {
   find,
@@ -34,58 +41,75 @@ import {
 
 class Console extends Component {
   state = {
-    newBatsman: {},
-    newBowler: {},
-    overCompleted: false,
-    extra: false,
-    boundary: false,
-    out: false,
-    extraType: "",
-    outType: "",
     whoIsOut: {},
     bowlerModal: false,
     batsmanModal: false,
+    initialPlayersModal: false,
     outModal: false,
     ER: runsJson,
     EE: extrasJson,
     WK: outJson,
-    runEvent: "",
-    extraEvent: "",
-    outEvent: "",
-    extraRun: 0,
-    batsmanBall: true,
-    bowlerBall: true,
-    bowlerWicket: false,
-    ballCounted: true
+    currentExtraJson: {},
+    currentRunJson: {},
+    currentOutJson: {},
+    battingCollection: "firstInningsBatting",
+    bowlingCollection: "firstInningsBowling",
+    scoreCollection: "firstInningsScore"
   };
 
   componentDidUpdate(prevProps) {
     const { score, currentMatch } = this.props;
-
+    if (currentMatch !== prevProps.currentMatch) {
+      let battingCollection,
+        bowlingCollection,
+        scoreCollection,
+        battingTeam,
+        bowlingTeam,
+        battingTeamId,
+        bowlingTeamId;
+      if (currentMatch[0].currentInnings === "SECOND_INNINGS") {
+        battingTeamId = currentMatch[0].secondBattingId;
+        bowlingTeamId = currentMatch[0].secondBowlingId;
+        battingTeam = currentMatch[0].secondBatting;
+        bowlingTeam = currentMatch[0].secondBowling;
+        this.props.getTeamPlayers(bowlingTeamId, "bowling");
+        this.props.getTeamPlayers(battingTeamId, "batting");
+        bowlingCollection = "secondInningsBowling";
+        battingCollection = "secondInningsBatting";
+        scoreCollection = "secondInningsScore";
+      } else {
+        battingTeamId = currentMatch[0].firstBattingId;
+        bowlingTeamId = currentMatch[0].firstBowlingId;
+        battingTeam = currentMatch[0].firstBatting;
+        bowlingTeam = currentMatch[0].firstBowling;
+        this.props.getTeamPlayers(bowlingTeamId, "bowling");
+        this.props.getTeamPlayers(battingTeamId, "batting");
+        bowlingCollection = "firstInningsBowling";
+        battingCollection = "firstInningsBatting";
+        scoreCollection = "firstInningsScore";
+      }
+      this.setState({
+        battingCollection,
+        bowlingCollection,
+        scoreCollection,
+        battingTeam,
+        bowlingTeam,
+        battingTeamId,
+        bowlingTeamId
+      });
+    }
     if (score !== prevProps.score) {
-      if (score.overCompleted && isEmpty(score.newBowler)) {
-        this.setState({ bowlerModal: true });
-      }
-      if (score.out && isEmpty(score.newBatsman)) {
-        this.setState({ batsmanModal: true });
-      }
-      if (currentMatch) {
-        if (currentMatch[0].currentInnings === "FIRST_INNINGS") {
-          this.props.getTeamPlayers(currentMatch[0].firstBowlingId, "bowling");
-          this.props.getTeamPlayers(currentMatch[0].firstBattingId, "batting");
-        }
-        if (currentMatch[0].currentInnings === "SECOND_INNINGS") {
-          this.props.getTeamPlayers(currentMatch[0].secondBowlingId, "bowling");
-          this.props.getTeamPlayers(currentMatch[0].secondBattingId, "batting");
-        }
+      if (score) {
+        this.setState({
+          bowlerModal: score.overCompleted && isEmpty(score.newBowler),
+          batsmanModal: score.out && isEmpty(score.newBatsman)
+        });
       }
     }
   }
-
   handleWhoIsOut = player => {
     if (!isEmpty(player)) this.setState({ whoIsOut: player, outModal: false });
   };
-
   handleUIReset = localVariable => {
     localVariable = map(localVariable, l => {
       l.selected = false;
@@ -95,155 +119,125 @@ class Console extends Component {
   };
   handleRunClick = eachRun => {
     const { ER } = this.state;
-    let currentRun = eachRun.run;
     let localEr = this.handleUIReset(ER);
     let localIndex = findIndex(localEr, eachRun);
     localEr[localIndex].selected = true;
     this.setState({
-      runs: parseInt(currentRun),
       ER: localEr,
-      runEvent: eachRun.event
+      currentRunJson: eachRun
     });
   };
   handleExtra = eachExtra => {
-    const { EE, extraRun } = this.state;
-    let localCurrentRun = extraRun;
-
+    const { EE } = this.state;
     let localEe = this.handleUIReset(EE);
     let localIndex = findIndex(localEe, eachExtra);
     localEe[localIndex].selected = true;
-    if (eachExtra.extraRun) {
-      localCurrentRun = localCurrentRun + 1;
-    }
+
     this.setState({
       EE: localEe,
-      extraRun: localCurrentRun,
-      extra: eachExtra.extra,
-      extraType: eachExtra.id,
-      extraEvent: eachExtra.event,
-      batsmanball: eachExtra.batsmanball,
-      bowlerBall: eachExtra.bowlerBall,
-      ballCounted: eachExtra.ballCounted
+      currentExtraJson: eachExtra
     });
   };
   handleOut = eachWicket => {
     const { WK } = this.state;
-    const { score } = this.props;
+    const { striker } = this.props;
     let localWk = this.handleUIReset(WK);
     let localIndex = findIndex(localWk, eachWicket);
     localWk[localIndex].selected = true;
     this.setState({
       WK: localWk,
       outModal: eachWicket.openModal,
-      out: eachWicket.out,
-      outType: eachWicket.id,
-      outEvent: eachWicket.event,
-      bowlerWicket: eachWicket.bowlerWicket,
-      whoIsOut: score.striker
+      whoIsOut: striker,
+      currentOutJson: eachWicket
     });
   };
-
   handleSubmitUI = () => {
     this.setState({
-      extra: false,
-      boundary: false,
-      out: false,
-      extraType: "",
-      outType: "",
       whoIsOut: {},
       bowlerModal: false,
       batsmanModal: false,
+      initialPlayersModal: false,
       outModal: false,
-      runEvent: "",
-      extraEvent: "",
-      outEvent: "",
-      extraRun: 0,
-      batsmanBall: true,
-      bowlerBall: true,
-      bowlerWicket: false,
       ER: this.handleUIReset(this.state.ER),
       EE: this.handleUIReset(this.state.EE),
       WK: this.handleUIReset(this.state.WK),
-      ballCounted: true
+      currentExtraJson: {},
+      currentRunJson: {},
+      currentOutJson: {}
     });
   };
-
   handleScore = () => {
     const { score, currentMatch, bowler, striker, nonStriker } = this.props;
     const {
-      runs,
-      out,
-      extra,
-      outType,
-      extraType,
-      runEvent,
-      extraEvent,
-      outEvent,
-      extraRun,
-      batsmanBall,
-      bowlerBall,
-      bowlerWicket,
-      whoIsOut
+      whoIsOut,
+      currentRunJson,
+      currentExtraJson,
+      currentOutJson,
+      scoreCollection
     } = this.state;
-    let showBall = true;
-    let nextBallCounted = true;
-    let wides = 0;
-    let noBalls = 0;
-    let byes = 0;
-    let fours = 0;
-    let sixes = 0;
-    let batsmanDots = 0;
-    let bowlerDots = 0;
-    let wickets = 0;
-    console.log(score);
-    let currentBall = score.ball;
-    let lastSixBalls = score.lastSixBalls;
-    let overCompleted = false;
+
+    let payload = {};
+    let localBowler = bowler;
     let localStriker = striker;
     let localNonStriker = nonStriker;
-    let localBowler = bowler;
-    let bowlerBalls = bowler.balls;
-    let batsmanBalls = striker.balls;
-    let bowlerRuns = bowler.runs + runs + extraRun;
-    let batsmanRuns = striker.runs + runs;
+    let currentBall = parseInt(score.ball);
+    let nextBallCounted = true;
+    let runs = 0;
+    let finalRuns = 0;
     let totalWickets = score.totalWickets;
-    let currentEvent = runEvent + extraEvent + outEvent;
-    currentEvent =
-      currentEvent.length > 1 ? replace(currentEvent, ".", "") : currentEvent;
-    if (batsmanBall) {
-      batsmanBalls++;
-    }
-    if (bowlerBall) {
-      bowlerBalls++;
-    }
-    if (runs === 0) {
-      batsmanDots = 1;
-      bowlerDots = 1;
-    } else if (runs === 4) {
-      fours = 1;
-    } else if (runs === 6) {
-      sixes = 1;
-    }
-    if (extra) {
-      if (extraEvent === "wd") {
-        wides = 1;
-        nextBallCounted = false;
-        bowlerDots = 0;
-      } else if (extraEvent === "nb") {
-        noBalls = 1;
-        nextBallCounted = false;
-        bowlerDots = 0;
-      } else if (extraEvent === "b") {
-        byes = 1;
+    let currentEvent = "";
+    let lastSixBalls = score.lastSixBalls;
+    let extra = false;
+    let extraType = "";
+    let extraRun = 0;
+    let out = false;
+    let outType = "";
+    let batsmanRun = true;
+    let batsmanBall = true;
+    let bowlerRun = true;
+    let bowlerBall = true;
+    let bowlerWicket = false;
+    let boundary = false;
+    let overCompleted = false;
+    if (!isEmpty(currentRunJson)) {
+      runs = parseInt(currentRunJson.run);
+      finalRuns += runs;
+      currentEvent += currentRunJson.event;
+      if (score.nextBallCounted) {
+        currentBall++;
       }
     }
-    if (score.nextBallCounted) {
-      currentBall++;
-    }
     let currentOver = calculateOvers(currentBall);
-    if (currentBall !== 0 && currentBall % 6 === 0) {
-      overCompleted = true;
+    if (!isEmpty(currentExtraJson)) {
+      if (currentExtraJson.extra) {
+        if (currentExtraJson.extraRun) {
+          finalRuns++;
+        }
+        if (!currentExtraJson.ballCounted) {
+          nextBallCounted = false;
+        }
+        currentEvent += currentExtraJson.event;
+        extra = currentExtraJson.extra;
+        extraType = currentExtraJson.id;
+        extraRun = currentExtraJson.extraRun;
+        batsmanBall = currentExtraJson.batsmanBall;
+        batsmanRun = currentExtraJson.batsmanRun;
+        bowlerBall = currentExtraJson.bowlerBall;
+        bowlerRun = currentExtraJson.bowlerRun;
+      }
     }
+
+    if (!isEmpty(currentOutJson)) {
+      out = currentOutJson.out;
+      outType = currentOutJson.id;
+      currentEvent += currentOutJson.event;
+      bowlerWicket = currentOutJson.bowlerWicket;
+      if (out) {
+        totalWickets++;
+      }
+    }
+    currentEvent =
+      currentEvent.length > 1 ? replace(currentEvent, ".", "") : currentEvent;
     if (lastSixBalls.length === 6) {
       lastSixBalls.pop();
     }
@@ -251,133 +245,131 @@ class Console extends Component {
       over: currentOver,
       event: currentEvent
     });
-    let totalRuns =
-      parseInt(score.totalRuns) + parseInt(runs) + parseInt(extraRun);
-    let CRR =
-      currentBall !== 0 ? round((totalRuns * 6) / currentBall, 2) : "INF";
-    let EXP =
-      currentBall !== 0 ? floor(CRR * parseInt(currentMatch[0].overs)) : "INF";
-    if (out) {
-      totalWickets++;
-      if (bowlerWicket) {
-        wickets = 1;
+    let totalRuns = score.totalRuns + finalRuns;
+    let CRR = currentRR(totalRuns, currentBall);
+    let EXP = expectedRuns(CRR, currentMatch[0].overs);
+
+    if (batsmanBall) {
+      localStriker = { ...localStriker, balls: localStriker.balls + 1 };
+    }
+    if (batsmanRun) {
+      localStriker = { ...localStriker, runs: localStriker.runs + runs };
+      if (runs === 0) {
+        localStriker = { ...localStriker, dots: localStriker.dots + 1 };
+        localBowler = { ...localBowler, dots: localBowler.dots + 1 };
       }
-      if (isEqual(whoIsOut, localStriker)) {
-        localStriker = {
-          ...localStriker,
-          out: true,
-          howOut: bowlerWicket ? localBowler.name : "run out"
-        };
+      if (runs === 4) {
+        localStriker = { ...localStriker, fours: localStriker.fours + 1 };
+        localBowler = { ...localBowler, fours: localBowler.fours + 1 };
+        boundary = true;
       }
-      if (isEqual(whoIsOut, localNonStriker)) {
-        localNonStriker = {
-          ...localNonStriker,
-          out: true,
-          howOut: "run out"
-        };
+      if (runs === 6) {
+        localStriker = { ...localStriker, sixes: localStriker.sixes + 1 };
+        localBowler = { ...localBowler, sixes: localBowler.sixes + 1 };
+        boundary = true;
       }
+    }
+    if (bowlerBall) {
+      localBowler = { ...localBowler, balls: localBowler.balls + 1 };
+    }
+    if (bowlerRun) {
+      localBowler = { ...localBowler, runs: localBowler.runs + finalRuns };
+    }
+    if (bowlerWicket) {
+      localBowler = { ...localBowler, wickets: localBowler.wickets + 1 };
     }
     localStriker = {
       ...localStriker,
-      balls: batsmanBalls,
-      runs: batsmanRuns,
-      dots: localStriker.dots + batsmanDots,
-      fours: localStriker.fours + fours,
-      sixes: localStriker.sixes + sixes,
-      sr: calculateSR(batsmanRuns, batsmanBalls)
+      sr: calculateSR(localStriker.runs, localStriker.balls)
     };
+    localBowler = { ...localBowler, overs: calculateOvers(localBowler.balls) };
     localBowler = {
       ...localBowler,
-      balls: bowlerBalls,
-      runs: bowlerRuns,
-      dots: bowler.dots + bowlerDots,
-      wides: bowler.wides + wides,
-      noBalls: bowler.noBalls + noBalls,
-      byes: bowler.byes + byes,
-      fours: bowler.fours + fours,
-      sixes: bowler.sixes + sixes,
-      overs: calculateOvers(bowlerBalls),
-      eco: calculateEco(bowlerRuns, bowlerBalls),
-      wickets: bowler.wickets + wickets
+      eco: calculateEco(localBowler.runs, localBowler.balls)
     };
-    let payload = {
+    if (extraType === "wd") {
+      localBowler = { ...localBowler, wides: localBowler.wides + 1 };
+    }
+    if (extraType === "nb") {
+      localBowler = { ...localBowler, noBalls: localBowler.noBalls + 1 };
+    }
+    if (extraType === "b") {
+      localBowler = { ...localBowler, byes: localBowler.byes + 1 };
+    }
+    if (out && whoIsOut.id === localStriker.id) {
+      localStriker = {
+        ...localStriker,
+        out: true,
+        howOut: bowlerWicket ? localBowler.name : "run out",
+        onStrike: false
+      };
+    }
+    if (out && whoIsOut.id === localNonStriker.id) {
+      localNonStriker = {
+        ...localNonStriker,
+        out: true,
+        howOut: "run out",
+        onStrike: false
+      };
+    }
+    if (currentBall !== 0 && currentBall % 6 === 0 && !extra) {
+      overCompleted = true;
+    }
+    payload = {
+      ...payload,
       runs,
+      lastSixBalls,
+      currentEvent,
       ball: currentBall,
       CRR,
       EXP,
+      nextBallCounted,
       currentOver,
-      striker: localStriker,
-      nonStriker: localNonStriker,
-      bowler: localBowler,
       totalRuns,
       totalWickets,
-      lastSixBalls,
-      overCompleted,
-      newBowler: {},
-      newBatsman: {},
       extra,
       extraType,
       out,
       outType,
       extraRun,
-      nextBallCounted,
-      showBall,
-      whoIsOut
+      whoIsOut,
+      striker: localStriker,
+      nonStriker: localNonStriker,
+      bowler: localBowler,
+      boundary,
+      newBowler: {},
+      newBatsman: {},
+      overCompleted,
+      changeStrike: false,
+      changeBowler: false,
+      endInnings: false
     };
-    console.log(payload);
-
-    this.props.addScoreToMatch(payload, "firstInningsScore");
+    this.props.addScoreToMatch(payload, scoreCollection);
     this.handleSubmitUI();
+    if (currentBall === parseInt(currentMatch[0].overs) * 6 && !extra) {
+      this.handleInnings();
+    }
   };
-
   handleStrike = () => {
     const { score } = this.props;
-    let localStriker = score.striker;
-    let localNonStriker = score.nonStriker;
-    let localScore = {
-      ...score,
-      striker: localNonStriker,
-      nonStriker: localStriker
-    };
-    this.props.updateScore(localScore, "firstInningsScore");
+    const { scoreCollection } = this.state;
+    let localScore = { ...score, changeStrike: true };
+    this.props.updateScore(localScore, scoreCollection);
   };
-
   handleBowler = () => {
-    const { score } = this.props;
     this.setState({ bowlerModal: true });
   };
-
   handleChangeBowler = (e, bowler) => {
     e.preventDefault();
-
-    const {
-      firstInningsBowling,
-      secondInningsBowling,
-      secondInningsScore,
-      firstInningsScore,
-      currentMatch
-    } = this.props;
-
-    var alreadyExists = find(firstInningsBowling, { id: bowler.id });
-
+    const { currentInningsBowling, score } = this.props;
+    const { scoreCollection } = this.state;
+    var alreadyExists = find(currentInningsBowling, { id: bowler.id });
     if (alreadyExists === undefined) {
       this.props.addBowler({
         ...bowler,
-        bowlingOrder: firstInningsBowling.length + 1
+        bowlingOrder: currentInningsBowling.length + 1
       });
     } else {
-      let scoreCollection = "secondInningsScore";
-
-      let score =
-        secondInningsScore &&
-        secondInningsScore.length &&
-        secondInningsScore[0];
-      if (currentMatch[0].currentInnings === "FIRST_INNINGS") {
-        scoreCollection = "firstInningsScore";
-        score =
-          firstInningsScore && firstInningsScore.length && firstInningsScore[0];
-      }
-
       this.props.updateScore(
         { ...score, newBowler: alreadyExists },
         scoreCollection
@@ -387,37 +379,17 @@ class Console extends Component {
       bowlerModal: !prevState.bowlerModal
     }));
   };
-
   handleChangeBatsman = (e, batsman) => {
     e.preventDefault();
-
-    const {
-      firstInningsBatting,
-      secondInningsBatting,
-      secondInningsScore,
-      firstInningsScore,
-      currentMatch
-    } = this.props;
-
-    var alreadyExists = find(firstInningsBatting, { id: batsman.id });
-
+    const { currentInningsBatting, currentMatch, score } = this.props;
+    const { scoreCollection } = this.state;
+    var alreadyExists = find(currentInningsBatting, { id: batsman.id });
     if (alreadyExists === undefined) {
       this.props.addBatsman({
         ...batsman,
-        battingOrder: firstInningsBatting.length + 1
+        battingOrder: currentInningsBatting.length + 1
       });
     } else {
-      let scoreCollection = "secondInningsScore";
-      let score =
-        secondInningsScore &&
-        secondInningsScore.length &&
-        secondInningsScore[0];
-      if (currentMatch[0].currentInnings === "FIRST_INNINGS") {
-        scoreCollection = "firstInningsScore";
-        score =
-          firstInningsScore && firstInningsScore.length && firstInningsScore[0];
-      }
-
       this.props.updateScore(
         { ...score, newBatsman: alreadyExists },
         scoreCollection
@@ -427,40 +399,67 @@ class Console extends Component {
       batsmanModal: !prevState.batsmanModal
     }));
   };
+  handleInitialPlayers = (e, striker, nonStriker, bowler) => {
+    e.preventDefault();
 
+    this.props.addPlayers(striker, nonStriker, bowler);
+    this.setState(prevState => ({
+      initialPlayersModal: !prevState.initialPlayersModal
+    }));
+  };
   handleInnings = () => {
-    const { score } = this.props;
+    const { currentMatch } = this.props;
+    let match = {
+      ...currentMatch[0],
+      statusType: 3,
+      status: "INNINGS_BREAK",
+      currentInnings: "SECOND_INNINGS",
+      initialPlayersNeeded: true
+    };
+    this.props.updateMatch(match);
   };
 
+  handleEndMatch = () => {
+    const { currentMatch } = this.props;
+    let match = {
+      ...currentMatch[0],
+      statusType: 5,
+      status: "MATCH_ENDED",
+      currentInnings: "SECOND_INNINGS",
+      initialPlayersNeeded: false
+    };
+    this.props.updateMatch(match);
+  };
   lastSixBalls = lastSixBalls =>
     lastSixBalls.length !== 0 &&
     lastSixBalls.map((ball, i) => (
-      <div key={i} className="col text-center p-1">
+      <div key={i} className="col-2 text-center p-1">
         <div className="score-label">{ball.over}</div>
         <div className="ball-values bg-white border border-light text-uppercase">
           {ball.event}
         </div>
       </div>
     ));
-
   toggle = () => {
     this.setState(prevState => ({
       bowlerModal: !prevState.bowlerModal
     }));
   };
-
   toggleOutModal = () => {
     this.setState(prevState => ({
       outModal: !prevState.outModal
     }));
   };
-
   toggleBatsmanModal = () => {
     this.setState(prevState => ({
       batsmanModal: !prevState.batsmanModal
     }));
   };
-
+  toggleInitialPlayersModal = () => {
+    this.setState(prevState => ({
+      initialPlayersModal: !prevState.initialPlayersModal
+    }));
+  };
   render() {
     const {
       currentMatch,
@@ -471,228 +470,260 @@ class Console extends Component {
       bowlingSquad,
       battingSquad
     } = this.props;
-    const { bowlerModal, ER, EE, WK, outModal, batsmanModal } = this.state;
-    if (currentMatch && score) {
-      return (
-        <div className="my-2">
-          {/* heading */}
-          <div className="m-3 border-bottom border-primary pb-3 score-label">
-            {currentMatch[0].teamOne} vs {currentMatch[0].teamTwo} at{" "}
-            {currentMatch[0].venue}
-          </div>
-          {/* top panel */}
-          <div className="container">
-            <div className="row text-center px-4">
-              <div className="col-3 bg-danger text-white p-1">
-                <div className="score-label text-uppercase">score</div>
-                <div className="score-values">
-                  {score.totalRuns}/{score.totalWickets}
+    const {
+      bowlerModal,
+      ER,
+      EE,
+      WK,
+      outModal,
+      batsmanModal,
+      battingTeam,
+      battingTeamId,
+      bowlingTeam,
+      bowlingTeamId,
+      initialPlayersModal
+    } = this.state;
+
+    if (currentMatch) {
+      if (!currentMatch[0].initialPlayersNeeded && score) {
+        return (
+          <div className="my-2">
+            {/* heading */}
+            <div className="m-3 border-bottom border-primary pb-3 score-label">
+              {currentMatch[0].teamOne} vs {currentMatch[0].teamTwo} at{" "}
+              {currentMatch[0].venue}
+            </div>
+            {/* top panel */}
+            <div className="container">
+              <div className="row text-center px-4">
+                <div className="col-3 bg-danger text-white p-1">
+                  <div className="score-label text-uppercase">score</div>
+                  <div className="score-values">
+                    {score.totalRuns}/{score.totalWickets}
+                  </div>
+                </div>
+                <div className="col-6 p-1 bg-light">
+                  <div className="score-label text-uppercase">crr</div>
+                  <div className="score-values">{score.CRR}</div>
+                </div>
+                <div className="col-3 bg-danger text-white p-1">
+                  <div className="score-label text-uppercase">overs</div>
+                  <div className="score-values">
+                    {score.currentOver}/{currentMatch[0].overs}
+                  </div>
                 </div>
               </div>
-              <div className="col-6 p-1 bg-light">
-                <div className="score-label text-uppercase">crr</div>
-                <div className="score-values">{score.CRR}</div>
-              </div>
-              <div className="col-3 bg-danger text-white p-1">
-                <div className="score-label text-uppercase">overs</div>
-                <div className="score-values">
-                  {score.currentOver}/{currentMatch[0].overs}
+              <div className="row my-1 px-4">
+                <div className="col bg-light">
+                  <div className="row">
+                    <div className="col-2 text-uppercase p-1">
+                      <img
+                        src={
+                          "https://static.thenounproject.com/png/635343-200.png"
+                        }
+                        alt="Bat"
+                        className="img-fluid"
+                      />
+                    </div>
+                    <div className="col-10 text-capitalize text-truncate border-right p-1">
+                      {striker && striker.name}
+                    </div>
+                  </div>
                 </div>
+                <div className="col">
+                  <div className="row bg-light">
+                    <div className="col-10 text-capitalize text-truncate p-1">
+                      {bowler && bowler.name}
+                    </div>
+                    <div className="col-2 text-uppercase p-1">
+                      <img
+                        src={
+                          "https://static.thenounproject.com/png/866374-200.png"
+                        }
+                        alt="Bat"
+                        className="img-fluid"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="row my-1 px-4">
+                <div className="col-3 text-uppercase bg-danger text-light innings-col">
+                  {currentMatch[0].currentInnings === "FIRST_INNINGS"
+                    ? "1st"
+                    : "2nd"}{" "}
+                  Inn
+                </div>
+                <div className="col-9 bg-light">
+                  <div className="score-label text-uppercase">exp runs</div>
+                  <div className="score-values">{score.EXP}</div>
+                </div>
+              </div>
+              <div className="row my-1 py-1 px-4">
+                {this.lastSixBalls(score.lastSixBalls)}
               </div>
             </div>
-            <div className="row my-1 px-4">
-              <div className="col bg-light">
-                <div className="row">
-                  <div className="col-3 text-uppercase p-1">
-                    <img
-                      src={
-                        "https://static.thenounproject.com/png/635343-200.png"
+            {/* runs panel */}
+            <div className="bg-secondary text-white p-3">
+              <div className="row">
+                <div className="score-label text-center text-uppercase col-12 mb-2">
+                  runs
+                </div>
+                <div className="text-center col-12">
+                  {ER.map((eachRun, index) => (
+                    <span
+                      key={index}
+                      onClick={() => {
+                        this.handleRunClick(eachRun);
+                      }}
+                      id={eachRun.id}
+                      className={
+                        eachRun.selected ? eachRun.selectedStyle : eachRun.style
                       }
-                      alt="Bat"
-                      className="img-fluid"
-                    />
+                    >
+                      {eachRun.run}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <hr />
+              <div className="row text-center">
+                <div className="col">
+                  <h3 className="score-label">extra</h3>
+                  <div className="row">
+                    {EE.map((eachExtra, index) => (
+                      <div
+                        key={index}
+                        onClick={() => {
+                          this.handleExtra(eachExtra);
+                        }}
+                        id={eachExtra.id}
+                        className={
+                          eachExtra.selected
+                            ? eachExtra.selectedStyle
+                            : eachExtra.style
+                        }
+                      >
+                        {eachExtra.type}
+                      </div>
+                    ))}
                   </div>
-                  <div className="col-9 text-capitalize text-truncate border-right p-1">
-                    {striker && striker.name}
+                </div>
+                <div className="col">
+                  <h3 className="score-label">wicket</h3>
+                  <div className="row">
+                    {WK.map((eachOut, index) => (
+                      <div
+                        key={index}
+                        onClick={() => {
+                          this.handleOut(eachOut);
+                        }}
+                        id={eachOut.id}
+                        className={
+                          eachOut.selected
+                            ? eachOut.selectedStyle
+                            : eachOut.style
+                        }
+                      >
+                        {eachOut.type}
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
-              <div className="col">
-                <div className="row bg-light">
-                  <div className="col-9 text-capitalize text-truncate p-1">
-                    {bowler && bowler.name}
-                  </div>
-                  <div className="col-3 text-uppercase p-1">
-                    <img
-                      src={
-                        "https://static.thenounproject.com/png/866374-200.png"
-                      }
-                      alt="Bat"
-                      className="img-fluid"
-                    />
-                  </div>
-                </div>
-              </div>
             </div>
-            <div className="row my-1 px-4">
-              <div className="col-3 text-uppercase bg-danger text-light innings-col">
-                {currentMatch[0].currentInnings === "FIRST_INNINGS"
-                  ? "1st"
-                  : "2nd"}{" "}
-                Inn
-              </div>
-              <div className="col-9 bg-light">
-                <div className="score-label text-uppercase">exp runs</div>
-                <div className="score-values">{score.EXP}</div>
-              </div>
+            {/* score submit */}
+            <div className="container mt-2">
+              <button
+                onClick={this.handleScore}
+                className="btn btn-block btn-success text-uppercase"
+              >
+                Submit
+              </button>
             </div>
-            <div className="row my-1 py-1 px-4">
-              {this.lastSixBalls(score.lastSixBalls)}
-            </div>
-          </div>
-          {/* runs panel */}
-          <div className="bg-secondary text-white p-3">
-            <div className="row">
-              <div className="score-label text-center text-uppercase col-12 mb-2">
-                runs
-              </div>
-              <div className="text-center col-12">
-                {ER.map((eachRun, index) => (
-                  <span
-                    key={index}
-                    onClick={() => {
-                      this.handleRunClick(eachRun);
-                    }}
-                    id={eachRun.id}
-                    className={
-                      eachRun.selected ? eachRun.selectedStyle : eachRun.style
-                    }
+            {/* change player panel */}
+            <div className="container my-2">
+              <div className="row">
+                <div className="col">
+                  <button
+                    onClick={this.handleStrike}
+                    className="btn btn-success text-uppercase"
                   >
-                    {eachRun.run}
-                  </span>
-                ))}
-              </div>
-            </div>
-            <hr />
-            <div className="row text-center">
-              <div className="col">
-                <h3 className="score-label">extra</h3>
-                <div className="row">
-                  {EE.map((eachExtra, index) => (
-                    <div
-                      key={index}
-                      onClick={() => {
-                        this.handleExtra(eachExtra);
-                      }}
-                      id={eachExtra.id}
-                      className={
-                        eachExtra.selected
-                          ? eachExtra.selectedStyle
-                          : eachExtra.style
-                      }
-                    >
-                      {eachExtra.type}
-                    </div>
-                  ))}
+                    Change strike
+                  </button>
                 </div>
-              </div>
-              <div className="col">
-                <h3 className="score-label">wicket</h3>
-                <div className="row">
-                  {WK.map((eachOut, index) => (
-                    <div
-                      key={index}
-                      onClick={() => {
-                        this.handleOut(eachOut);
-                      }}
-                      id={eachOut.id}
-                      className={
-                        eachOut.selected ? eachOut.selectedStyle : eachOut.style
-                      }
-                    >
-                      {eachOut.type}
-                    </div>
-                  ))}
+                <div className="col">
+                  <button
+                    onClick={this.handleBowler}
+                    className="btn btn-warning text-uppercase"
+                  >
+                    Change bowler
+                  </button>
+                </div>
+                <div className="col">
+                  <button
+                    onClick={this.handleInnings}
+                    className="btn btn-danger text-uppercase"
+                  >
+                    end innings
+                  </button>
                 </div>
               </div>
             </div>
-          </div>
-          {/* score submit */}
-          <div className="container mt-2">
-            <button
-              onClick={this.handleScore}
-              className="btn btn-block btn-success text-uppercase"
+            {/* live scorecard */}
+            <LiveScorecard
+              striker={striker}
+              nonStriker={nonStriker}
+              bowler={bowler}
+            />
+            {/* Full scoredard */}
+            <Link
+              to={`/match/${currentMatch[0].id}/scorecard`}
+              className="btn btn-info btn-block"
+              target="_blank"
             >
-              Submit
-            </button>
+              Full Scorecard
+            </Link>
+            {/* modals */}
+            <BowlerModal
+              openModal={bowlerModal}
+              toggle={this.toggle}
+              submitBowler={this.handleChangeBowler}
+              bowlingSquad={bowlingSquad}
+              bowlingTeam={bowlingTeam}
+              bowlingTeamId={bowlingTeamId}
+            />
+            <OutModal
+              openModal={outModal}
+              toggle={this.toggleOutModal}
+              striker={striker}
+              nonStriker={nonStriker}
+              handleWhoIsOut={this.handleWhoIsOut}
+            />
+            <BatsmanModal
+              openModal={batsmanModal}
+              toggle={this.toggleBatsmanModal}
+              submitBatsman={this.handleChangeBatsman}
+              battingSquad={battingSquad}
+              battingTeam={battingTeam}
+              battingTeamId={battingTeamId}
+            />
           </div>
-          {/* change player panel */}
-          <div className="container mt-2">
-            <div className="row">
-              <div className="col">
-                <button
-                  onClick={this.handleStrike}
-                  className="btn btn-success text-uppercase"
-                >
-                  Change strike
-                </button>
-              </div>
-              <div className="col">
-                <button
-                  onClick={this.handleBowler}
-                  className="btn btn-warning text-uppercase"
-                >
-                  Change bowler
-                </button>
-              </div>
-              <div className="col">
-                <button
-                  onClick={this.handleInnings}
-                  className="btn btn-danger text-uppercase"
-                >
-                  end innings
-                </button>
-              </div>
-            </div>
-          </div>
-          {/* live scorecard */}
-          <LiveScorecard
-            striker={striker}
-            nonStriker={nonStriker}
-            bowler={bowler}
-          />
-          {/* Full scoredard */}
-          <Link
-            to={`/match/${currentMatch[0].id}/scorecard`}
-            className="btn btn-info btn-block"
-            target="_blank"
-          >
-            Full Scorecard
-          </Link>
-          {/* modals */}
-          <BowlerModal
-            openModal={bowlerModal}
-            toggle={this.toggle}
-            submitBowler={this.handleChangeBowler}
-            currentMatch={currentMatch[0]}
-            bowlingSquad={bowlingSquad}
-          />
-          <OutModal
-            openModal={outModal}
-            toggle={this.toggleOutModal}
-            striker={striker}
-            nonStriker={nonStriker}
-            handleWhoIsOut={this.handleWhoIsOut}
-          />
-          <BatsmanModal
-            openModal={batsmanModal}
-            toggle={this.toggleBatsmanModal}
-            submitBatsman={this.handleChangeBatsman}
-            currentMatch={currentMatch[0]}
+        );
+      } else {
+        return (
+          <AddPlayerModal
+            openModal={currentMatch[0].initialPlayersNeeded}
+            submitInitialPlayers={this.handleInitialPlayers}
             battingSquad={battingSquad}
+            bowlingSquad={bowlingSquad}
+            bowlingTeam={bowlingTeam}
+            bowlingTeamId={bowlingTeamId}
+            battingTeam={battingTeam}
+            battingTeamId={battingTeamId}
           />
-        </div>
-      );
+        );
+      }
     } else {
       return (
         <div className="container center">
@@ -709,13 +740,18 @@ const mapStateToProps = state => {
   let nonStriker = {};
   let currentMatch = state.firestore.ordered.matches;
   let score;
+  let currentInningsBowling, currentInningsBatting;
   if (currentMatch) {
     if (currentMatch[0].currentInnings === "FIRST_INNINGS") {
       score = state.firestore.ordered.firstInningsScore;
+      currentInningsBowling = state.firestore.ordered.firstInningsBowling;
+      currentInningsBatting = state.firestore.ordered.firstInningsBatting;
     } else {
       score = state.firestore.ordered.secondInningsScore;
+      currentInningsBowling = state.firestore.ordered.secondInningsBowling;
+      currentInningsBatting = state.firestore.ordered.secondInningsBatting;
     }
-    if (score) {
+    if (!currentMatch[0].initialPlayersNeeded && score) {
       score = score[0];
 
       striker = score.striker;
@@ -728,7 +764,7 @@ const mapStateToProps = state => {
           nonStriker = score.striker;
         }
       } else {
-        if (score.ball % 6 === 0) {
+        if (score.ball !== 0 && score.ball % 6 === 0 && !score.extra) {
           striker = score.nonStriker;
           nonStriker = score.striker;
         }
@@ -746,6 +782,13 @@ const mapStateToProps = state => {
           nonStriker = score.newBatsman;
         }
       }
+      striker = { ...striker, onStrike: true, out: false };
+      nonStriker = { ...nonStriker, onStrike: false, out: false };
+      if (score.changeStrike) {
+        let tempStriker = striker;
+        striker = nonStriker;
+        nonStriker = tempStriker;
+      }
     }
   }
   return {
@@ -757,12 +800,8 @@ const mapStateToProps = state => {
     nonStriker: nonStriker,
     bowlingSquad: state.matches.bowlingSquad,
     battingSquad: state.matches.battingSquad,
-    firstInningsBowling: state.firestore.ordered.firstInningsBowling,
-    secondInningsBowling: state.firestore.ordered.secondInningsBowling,
-    firstInningsBatting: state.firestore.ordered.firstInningsBatting,
-    secondInningsBatting: state.firestore.ordered.secondInningsBatting,
-    firstInningsScore: state.firestore.ordered.firstInningsScore,
-    secondInningsScore: state.firestore.ordered.secondInningsScore
+    currentInningsBatting: currentInningsBatting,
+    currentInningsBowling: currentInningsBowling
   };
 };
 const mapDispatchToProps = dispatch => {
@@ -774,7 +813,11 @@ const mapDispatchToProps = dispatch => {
     addBowler: bowler => dispatch(addBowler(bowler)),
     addBatsman: batsman => dispatch(addBatsman(batsman)),
     updateScore: (score, whichCollection) =>
-      dispatch(updateScore(score, whichCollection))
+      dispatch(updateScore(score, whichCollection)),
+    addPlayers: (striker, nonStriker, bowler) =>
+      dispatch(addPlayers(striker, nonStriker, bowler)),
+
+    updateMatch: payload => dispatch(updateMatch(payload))
   };
 };
 

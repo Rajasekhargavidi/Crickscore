@@ -18,8 +18,9 @@ class BowlerModal extends React.Component {
       openModal,
       toggle,
       submitBowler,
-      currentMatch,
-      bowlingSquad
+      bowlingSquad,
+      bowlingTeam,
+      bowlingTeamId
     } = this.props;
     return (
       <Modal
@@ -36,7 +37,7 @@ class BowlerModal extends React.Component {
           className="m-0 p-0"
         >
           <ModalBody>
-            <h5>Bowling Team: {currentMatch.firstBowling}</h5>
+            <h5>Bowling Team: {bowlingTeam}</h5>
             <div className="form-group row">
               <label htmlFor="bowler" className="col-sm-2 col-form-label">
                 Bowler
@@ -45,7 +46,6 @@ class BowlerModal extends React.Component {
                 <Typeahead
                   labelKey="name"
                   onChange={selected => {
-                    
                     if (selected.length) {
                       let bowlerId;
                       if (has(selected[0], "customOption")) {
@@ -57,8 +57,8 @@ class BowlerModal extends React.Component {
                         bowler: {
                           id: bowlerId,
                           name: startCase(toLower(selected[0].name)),
-                          teamName: currentMatch.firstBowling,
-                          teamId: currentMatch.firstBowlingId,
+                          teamName: bowlingTeam,
+                          teamId: bowlingTeamId,
                           onStrike: true,
                           bowlingOrder: 2,
                           balls: 0,

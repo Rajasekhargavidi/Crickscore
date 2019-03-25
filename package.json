@@ -12,6 +12,7 @@
     "react": "^16.4.1",
     "react-bootstrap-typeahead": "^4.0.0-alpha.1",
     "react-dom": "^16.4.1",
+    "react-places-autocomplete": "^7.2.1",
     "react-redux": "^5.0.7",
     "react-redux-firebase": "^2.1.6",
     "react-router-dom": "^4.3.1",

@@ -12,10 +12,6 @@ import {
 import { isEmpty } from "lodash";
 
 class OutModal extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
   state = {
     whoIsOut: {}
   };

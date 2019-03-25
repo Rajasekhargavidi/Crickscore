@@ -14,6 +14,23 @@ export const calculateEco = (runs, balls) => {
   return round((runs * 6) / balls, 2);
 };
 
+export const currentRR = (runs, balls) => {
+  if (balls === undefined || runs === undefined || balls === 0 || runs === 0)
+    return "INF";
+  return round((runs * 6) / balls, 2);
+};
+
+export const expectedRuns = (CRR, overs) => {
+  if (CRR === undefined || overs === undefined || CRR === "INF") return "INF";
+  return floor(CRR * parseInt(overs));
+};
+
+export const requiredRR = (runs, balls) => {
+  if (balls === undefined || runs === undefined || balls === 0 || runs === 0)
+    return 0.0;
+  return round((runs * 6) / balls, 2);
+};
+
 export const calculateSR = (runs, balls) => {
   if (balls === 0) return "NA";
   return round((runs * 100) / balls);

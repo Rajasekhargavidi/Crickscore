@@ -18,7 +18,7 @@ import { has, startCase, toLower, find } from "lodash";
 
 class AddBatsman extends Component {
   state = {
-    bowler: {
+    batsman: {
       id: "",
       name: "",
       teamName: "",
@@ -36,26 +36,25 @@ class AddBatsman extends Component {
       firstInningsScore,
       secondInningsScore
     } = this.props;
-    const { bowler } = this.state;
-    
-    var alreadyExists = find(firstInningsBowling, { id: bowler.id });
-    
+    const { batsman } = this.state;
+
+    var alreadyExists = find(firstInningsBowling, { id: batsman.id });
+
     if (alreadyExists === undefined) {
-      this.props.addBowler({
-        ...bowler,
+      this.props.addBatsman({
+        ...batsman,
         bowlingOrder: firstInningsBowling.length + 1
       });
     } else {
       let scoreCollection = "secondInningsScore";
-      
-      
+
       let score = secondInningsScore.length && secondInningsScore[0];
       if (currentMatch[0].currentInnings === "FIRST_INNINGS") {
         scoreCollection = "firstInningsScore";
         score = firstInningsScore.length && firstInningsScore[0];
       }
       this.props.updateScore(
-        { ...score, newBowler: alreadyExists },
+        { ...score, newBatsman: alreadyExists },
         scoreCollection
       );
     }
@@ -68,10 +67,8 @@ class AddBatsman extends Component {
 
   componentDidUpdate(previousProps, previousState) {
     const { currentMatch, overCompleted } = this.props;
-    
-    
+
     if (previousProps.currentMatch !== currentMatch) {
-      
       if (currentMatch) {
         if (currentMatch[0].currentInnings === "FIRST_INNINGS") {
           this.props.getTeamPlayers(currentMatch[0].firstBowlingId, "bowling");
@@ -132,7 +129,6 @@ class AddBatsman extends Component {
                 <Typeahead
                   labelKey="name"
                   onChange={selected => {
-                    
                     if (selected.length) {
                       let bowlerId;
                       if (has(selected[0], "customOption")) {
@@ -178,7 +174,6 @@ class AddBatsman extends Component {
 }
 
 const mapStateToProps = state => {
-  
   return {
     auth: state.firebase.auth,
     currentMatch: state.firestore.ordered.matches,

@@ -17,7 +17,7 @@ export const createMatch = match => {
           createdAt: new Date()
         })
         .then(() => {
-          console.log("team added successfully");
+          console.log(match.teamOne + " team added successfully");
         })
         .catch(err => console.log(err));
     }
@@ -35,7 +35,7 @@ export const createMatch = match => {
           createdAt: new Date()
         })
         .then(() => {
-          console.log("team added successfully");
+          console.log(match.teamTwo + " team added successfully");
         })
         .catch(err => console.log(err));
     }
@@ -49,7 +49,7 @@ export const createMatch = match => {
         secondBowlingId: match.teamOneId,
         secondBowling: match.teamOne,
         secondBattingId: match.teamTwoId,
-        secondbatting: match.teamTwo
+        secondBatting: match.teamTwo
       };
     } else {
       match = {
@@ -71,12 +71,20 @@ export const createMatch = match => {
         scorerLastName: profile.lastName,
         scorerId: scorerId,
         status: 1,
-        statusType: "CREATED",
+        statusType: "TOSS",
         currentInnings: "FIRST_INNINGS",
+        initialPlayersNeeded: true,
+        firstInningsRuns: 0,
+        firstInningsOvers: 0.0,
+        firstInningsWickets: 0,
+        secondInningsRuns: 0,
+        secondInningsOvers: 0.0,
+        secondInningsWickets: 0,
         createdAt: new Date()
       })
       .then(() => {
         match = { ...match, id: ref.id };
+        console.log("match created successfully");
         dispatch({ type: "CREATE_MATCH", match });
       })
       .catch(err => console.log(err));
@@ -88,10 +96,10 @@ export const addBowler = player => {
     const currentMatch = getState().firestore.ordered.matches;
     const score = getState().firestore.ordered.firstInningsScore;
     const match = currentMatch[0];
-    let whichCollection = "secondInningsBowling";
+    let bowlingCollection = "secondInningsBowling";
     let scoreCollection = "secondInningsScore";
     if (match.currentInnings === "FIRST_INNINGS") {
-      whichCollection = "firstInningsBowling";
+      bowlingCollection = "firstInningsBowling";
       scoreCollection = "firstInningsScore";
     }
     if (player.id === "") {
@@ -99,21 +107,22 @@ export const addBowler = player => {
       player = { ...player, id: playerRef.id };
       dispatch(addPlayer(player));
     }
-    dispatch(addPlayerToMatch(player, whichCollection));
+    // dispatch(addPlayerToMatch(player, bowlingCollection));
     let scorePlayload = { ...score[0], newBowler: player };
     dispatch(updateScore(scorePlayload, scoreCollection));
   };
 };
 export const addBatsman = player => {
+  console.log(player);
   return (dispatch, getState, { getFirebase, getFirestore }) => {
     const firestore = getFirestore();
     const currentMatch = getState().firestore.ordered.matches;
     const score = getState().firestore.ordered.firstInningsScore;
     const match = currentMatch[0];
-    let whichCollection = "secondInningsBatting";
+    let battingCollection = "secondInningsBatting";
     let scoreCollection = "secondInningsScore";
     if (match.currentInnings === "FIRST_INNINGS") {
-      whichCollection = "firstInningsBatting";
+      battingCollection = "firstInningsBatting";
       scoreCollection = "firstInningsScore";
     }
     if (player.id === "") {
@@ -121,7 +130,7 @@ export const addBatsman = player => {
       player = { ...player, id: playerRef.id };
       dispatch(addPlayer(player));
     }
-    dispatch(addPlayerToMatch(player, whichCollection));
+    // dispatch(addPlayerToMatch(player, battingCollection));
     let scorePlayload = { ...score[0], newBatsman: player };
     dispatch(updateScore(scorePlayload, scoreCollection));
   };
@@ -130,17 +139,24 @@ export const addPlayers = (striker, nonStriker, bowler) => {
   return (dispatch, getState, { getFirebase, getFirestore }) => {
     const firestore = getFirestore();
     const currentMatch = getState().firestore.ordered.matches;
-
     const match = currentMatch[0];
-    let battingCollection, bowlingCollection, scoreCollection;
+    let battingCollection,
+      bowlingCollection,
+      scoreCollection,
+      status,
+      statusType;
     if (match.currentInnings === "FIRST_INNINGS") {
       battingCollection = "firstInningsBatting";
       bowlingCollection = "firstInningsBowling";
       scoreCollection = "firstInningsScore";
+      status = 2;
+      statusType = "STARTED";
     } else {
       battingCollection = "secondInningsBatting";
       bowlingCollection = "secondInningsBowling";
       scoreCollection = "secondInningsScore";
+      status = 4;
+      statusType = "STARTED";
     }
     if (striker.id === "") {
       const strikerRef = firestore.collection("players").doc();
@@ -158,9 +174,6 @@ export const addPlayers = (striker, nonStriker, bowler) => {
       bowler = { ...bowler, id: bowlerRef.id };
       dispatch(addPlayer(bowler));
     }
-    dispatch(addPlayerToMatch(nonStriker, battingCollection));
-    dispatch(addPlayerToMatch(bowler, bowlingCollection));
-    dispatch(addPlayerToMatch(striker, battingCollection));
     let score = {
       ball: 0,
       bowler: bowler,
@@ -184,7 +197,14 @@ export const addPlayers = (striker, nonStriker, bowler) => {
       showBall: false,
       nextBallCounted: true
     };
-    let matchPayload = { ...match, status: 2, statusType: "STARTED" };
+    let matchPayload = {
+      ...match,
+      status: status,
+      statusType: statusType,
+      initialPlayersNeeded: false
+    };
+    console.log(scoreCollection);
+    console.log(match.currentInnings);
     dispatch(addScoreToMatch(score, scoreCollection));
     dispatch(updateMatch(matchPayload));
   };
@@ -210,8 +230,7 @@ export const addPlayerToMatch = (player, whichCollection) => {
         createdAt: new Date()
       })
       .then(() => {
-        console.log("player added to match");
-        // dispatch({ type: "CREATE_PLAYERS", players });
+        console.log(player.name + " added to match");
       })
       .catch(err => console.log(err));
   };
@@ -232,7 +251,7 @@ export const addPlayer = player => {
         createdAt: new Date()
       })
       .then(() => {
-        console.log("player added");
+        console.log(player.name + " added");
       })
       .catch(err => console.log(err));
     firestore
@@ -249,7 +268,7 @@ export const addPlayer = player => {
         createdAt: new Date()
       })
       .then(() => {
-        console.log("player added to team");
+        console.log(player.name + " added to team " + player.teamName);
       })
       .catch(err => console.log(err));
   };
@@ -261,6 +280,8 @@ export const addScoreToMatch = (score, whichCollection) => {
     const scorerId = getState().firebase.auth.uid;
     const currentMatch = getState().firestore.ordered.matches;
     const match = currentMatch[0];
+    console.log(match.currentInnings);
+    console.log(whichCollection);
     firestore
       .collection("matches")
       .doc(match.id)
@@ -275,15 +296,11 @@ export const addScoreToMatch = (score, whichCollection) => {
       })
       .then(() => {
         console.log("score added to match");
-        dispatch(updateMatchPlayer(score.striker, "firstInningsBatting"));
-        dispatch(updateMatchPlayer(score.nonStriker, "firstInningsBatting"));
-        dispatch(updateMatchPlayer(score.bowler, "firstInningsBowling"));
         dispatch({ type: "ADD_SCORE", score });
       })
       .catch(err => console.log(err));
   };
 };
-
 export const getTeamPlayers = (teamId, teamAction) => {
   return (dispatch, getState, { getFirebase, getFirestore }) => {
     const firestore = getFirestore();
@@ -357,28 +374,7 @@ export const updateScore = (payload, whichCollection) => {
         updatedAt: new Date()
       })
       .then(() => {
-        console.log(payload, "score updated");
-      })
-      .catch(err => console.log(err));
-  };
-};
-export const updateMatchPlayer = (payload, whichCollection) => {
-  //later this should be a cloud function
-  return (dispatch, getState, { getFirebase, getFirestore }) => {
-    const firestore = getFirestore();
-    const currentMatch = getState().firestore.ordered.matches;
-    const match = currentMatch[0];
-    firestore
-      .collection("matches")
-      .doc(match.id)
-      .collection(whichCollection)
-      .doc(payload.id)
-      .set({
-        ...payload,
-        updatedAt: new Date()
-      })
-      .then(() => {
-        console.log("player updated");
+        console.log("score updated... ");
       })
       .catch(err => console.log(err));
   };

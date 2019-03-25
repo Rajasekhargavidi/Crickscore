@@ -3,6 +3,16 @@ import { Redirect } from "react-router-dom";
 import { connect } from "react-redux";
 import { signUp } from "../../store/actions/auth";
 
+import {
+  Col,
+  Button,
+  Form,
+  FormGroup,
+  Label,
+  Input,
+  FormText
+} from "reactstrap";
+
 class SignUp extends Component {
   state = {
     email: "",
@@ -24,48 +34,70 @@ class SignUp extends Component {
     }
     return (
       <div className="container">
-        <form onSubmit={this.handleSubmit} className="white" autoComplete="off">
-          <h5 className="grey-text text-darken-3">Sign Up</h5>
-          <div className="input-field">
-            <label htmlFor="firstName">First Name</label>
-            <input
-              type="text"
-              className=""
-              id="firstName"
-              onChange={this.handleChange}
-            />
-          </div>
-          <div className="input-field">
-            <label htmlFor="lastName">Last Name</label>
-            <input
-              type="text"
-              className=""
-              id="lastName"
-              onChange={this.handleChange}
-            />
-          </div>
-          <div className="input-field">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              className=""
-              id="email"
-              onChange={this.handleChange}
-            />
-          </div>
-          <div className="input-field">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              className=""
-              id="password"
-              onChange={this.handleChange}
-            />
-          </div>
-          <div className="input-field">
-            <button className="btn pink light-1 z-depth-0">Sign Up</button>
-          </div>
-        </form>
+        <Form onSubmit={this.handleSubmit}>
+          <h5 className="border-bottom pb-2">Sign Up</h5>
+          <FormGroup row>
+            <Label for="firstName" sm={2}>
+              First Name
+            </Label>
+            <Col sm={10}>
+              <Input
+                type="text"
+                name="firstName"
+                id="firstName"
+                placeholder="Enter First Name"
+                onChange={this.handleChange}
+              />
+            </Col>
+          </FormGroup>
+          <FormGroup row>
+            <Label for="lastName" sm={2}>
+              Last Name
+            </Label>
+            <Col sm={10}>
+              <Input
+                type="text"
+                name="lastName"
+                id="lastName"
+                placeholder="Enter Last Name"
+                onChange={this.handleChange}
+              />
+            </Col>
+          </FormGroup>
+          <FormGroup row>
+            <Label for="email" sm={2}>
+              Email
+            </Label>
+            <Col sm={10}>
+              <Input
+                type="email"
+                name="email"
+                id="email"
+                placeholder="Enter Email"
+                onChange={this.handleChange}
+              />
+            </Col>
+          </FormGroup>
+          <FormGroup row>
+            <Label for="password" sm={2}>
+              Password
+            </Label>
+            <Col sm={10}>
+              <Input
+                type="password"
+                name="password"
+                id="password"
+                placeholder="Enter Password"
+                onChange={this.handleChange}
+              />
+            </Col>
+          </FormGroup>
+          <FormGroup row>
+            <Col>
+              <Button color="success">Register</Button>
+            </Col>
+          </FormGroup>
+        </Form>
       </div>
     );
   }

@@ -9,6 +9,8 @@ var config = {
   storageBucket: "",
   messagingSenderId: "771370686931"
 };
-firebase.initializeApp(config);
+firebase.initializeApp(config, {
+  timestampsInSnapshots: true
+});
 
 export default firebase;

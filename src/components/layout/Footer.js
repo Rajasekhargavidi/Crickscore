@@ -17,8 +17,8 @@ const Footer = () => {
             <h5 className="text-light">Settings</h5>
             <ul>
               <li>
-                <a className="text-light" href="#!">
-                  Link 1
+                <a className="text-light" href="/newMatch">
+                  New Match
                 </a>
               </li>
               <li>

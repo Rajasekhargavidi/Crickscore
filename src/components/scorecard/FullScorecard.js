@@ -30,12 +30,8 @@ class FullScorecard extends Component {
   state = {
     activeTab: "1"
   };
-  componentWillMount() {
-    
-  }
-  componentDidMount() {
-    
-  }
+  componentWillMount() {}
+  componentDidMount() {}
   toggle = tab => {
     if (this.state.activeTab !== tab) {
       this.setState({
@@ -64,7 +60,7 @@ class FullScorecard extends Component {
       return (
         <div className="container mt-5">
           <a href="/matches">All Matches</a>
-          <h3>
+          <h3 classs="score-label">
             {currentMatch[0].teamOne} vs {currentMatch[0].teamTwo} at{" "}
             {currentMatch[0].venue}
           </h3>
@@ -182,7 +178,6 @@ class FullScorecard extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  
   let striker = {};
   let bowler = {};
   let nonStriker = {};
@@ -250,24 +245,28 @@ export default compose(
       collection: "matches",
       doc: props.match.params.matchId,
       subcollections: [{ collection: "firstInningsBatting" }],
+      orderBy: ["battingOrder", "asc"],
       storeAs: "firstInningsBatting"
     },
     {
       collection: "matches",
       doc: props.match.params.matchId,
       subcollections: [{ collection: "firstInningsBowling" }],
+      orderBy: ["bowlingOrder", "asc"],
       storeAs: "firstInningsBowling"
     },
     {
       collection: "matches",
       doc: props.match.params.matchId,
       subcollections: [{ collection: "secondInningsBatting" }],
+      orderBy: ["battingOrder", "asc"],
       storeAs: "secondInningsBatting"
     },
     {
       collection: "matches",
       doc: props.match.params.matchId,
       subcollections: [{ collection: "secondInningsBowling" }],
+      orderBy: ["bowlingOrder", "asc"],
       storeAs: "secondInningsBowling"
     }
   ])

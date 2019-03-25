@@ -14,7 +14,9 @@ export const extrasJson = [
     id: "wide",
     extra: true,
     batsmanBall: false,
-    bowlerBall: false
+    bowlerBall: false,
+    batsmanRun: false,
+    bowlerRun: true
   },
   {
     type: "no ball",
@@ -31,7 +33,9 @@ export const extrasJson = [
     id: "noBall",
     extra: true,
     batsmanBall: true,
-    bowlerBall: false
+    bowlerBall: false,
+    batsmanRun: true,
+    bowlerRun: true
   },
   {
     type: "bye",
@@ -48,7 +52,9 @@ export const extrasJson = [
     id: "bye",
     extra: true,
     batsmanBall: true,
-    bowlerBall: true
+    bowlerBall: true,
+    batsmanRun: false,
+    bowlerRun: false
   },
   {
     type: "leg bye",
@@ -65,7 +71,9 @@ export const extrasJson = [
     id: "legBye",
     extra: true,
     batsmanBall: true,
-    bowlerBall: true
+    bowlerBall: true,
+    batsmanRun: false,
+    bowlerRun: false
   },
   {
     type: "no extra",
@@ -82,7 +90,9 @@ export const extrasJson = [
     id: "noExtra",
     extra: false,
     batsmanBall: true,
-    bowlerBall: true
+    bowlerBall: true,
+    batsmanRun: true,
+    bowlerRun: true
   }
 ];
 export const runsJson = [
@@ -93,7 +103,8 @@ export const runsJson = [
     selectedStyle:
       "col current-run bg-success text-white align-middle mx-2 p-1",
     id: "zero",
-    event: "."
+    event: ".",
+    disable: ["bye", "legBye"]
   },
   {
     run: 1,
@@ -102,7 +113,8 @@ export const runsJson = [
     selectedStyle:
       "col current-run bg-success text-white align-middle mx-2 p-1",
     id: "one",
-    event: "1"
+    event: "1",
+    disable: []
   },
   {
     run: 2,
@@ -111,7 +123,8 @@ export const runsJson = [
     selectedStyle:
       "col current-run bg-success text-white align-middle mx-2 p-1",
     id: "two",
-    event: "2"
+    event: "2",
+    disable: []
   },
   {
     run: 3,
@@ -120,7 +133,8 @@ export const runsJson = [
     selectedStyle:
       "col current-run bg-success text-white align-middle mx-2 p-1",
     id: "three",
-    event: "3"
+    event: "3",
+    disable: []
   },
   {
     run: 4,
@@ -129,7 +143,8 @@ export const runsJson = [
     selectedStyle:
       "col current-run bg-success text-white align-middle mx-2 p-1",
     id: "four",
-    event: "4"
+    event: "4",
+    disable: []
   },
   {
     run: 5,
@@ -138,7 +153,8 @@ export const runsJson = [
     selectedStyle:
       "col current-run bg-success text-white align-middle mx-2 p-1",
     id: "five",
-    event: "5"
+    event: "5",
+    disable: []
   },
   {
     run: 6,
@@ -147,7 +163,8 @@ export const runsJson = [
     selectedStyle:
       "col current-run bg-success text-white align-middle mx-2 p-1",
     id: "six",
-    event: "6"
+    event: "6",
+    disable: []
   }
 ];
 
