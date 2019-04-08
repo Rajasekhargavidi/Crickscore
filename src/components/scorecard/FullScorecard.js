@@ -44,7 +44,6 @@ class FullScorecard extends Component {
 
   render() {
     const {
-      auth,
       currentMatch,
       striker,
       nonStriker,
@@ -55,9 +54,6 @@ class FullScorecard extends Component {
       secondInningsBowling,
       scores
     } = this.props;
-    if (!auth.uid) {
-      return <Redirect to="/signIn" />;
-    }
     if (currentMatch) {
       return (
         <div className="container mt-5">

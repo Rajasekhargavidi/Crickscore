@@ -3,7 +3,7 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 import { Typeahead } from "react-bootstrap-typeahead";
 import "react-bootstrap-typeahead/css/Typeahead.css";
 import "react-bootstrap-typeahead/css/Typeahead-bs4.css";
-import { has, startCase, toLower, find } from "lodash";
+import { has, startCase, toLower, find, isEmpty } from "lodash";
 
 class BatsmanModal extends React.Component {
   constructor(props) {
@@ -22,13 +22,10 @@ class BatsmanModal extends React.Component {
       battingTeam,
       battingTeamId
     } = this.props;
+    const { batsman } = this.state;
     return (
-      <Modal
-        isOpen={openModal}
-        toggle={toggle}
-        className={this.props.className}
-      >
-        <ModalHeader toggle={toggle}>Change Batsman</ModalHeader>
+      <Modal isOpen={openModal} className={this.props.className}>
+        <ModalHeader>Change Batsman</ModalHeader>
         <form
           onSubmit={e => {
             submitBatsman(e, this.state.batsman);
@@ -85,10 +82,9 @@ class BatsmanModal extends React.Component {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button color="primary">Change Batsman</Button>{" "}
-            <Button color="secondary" onClick={toggle}>
-              Cancel
-            </Button>
+            <Button color="primary" disabled={isEmpty(batsman)}>
+              Change Batsman
+            </Button>{" "}
           </ModalFooter>
         </form>
       </Modal>

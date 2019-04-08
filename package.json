@@ -1,6 +1,6 @@
 {
-  "name": "proman",
-  "version": "0.1.0",
+  "name": "Crikscore",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "bootstrap": "^4.2.1",

@@ -5,13 +5,18 @@ const SignedOutLinks = () => {
   return (
     <ul className="navbar-nav mr-auto">
       <li className="nav-item active">
+        <NavLink to="/matches" className="nav-link">
+          All Matches
+        </NavLink>
+      </li>
+      <li className="nav-item active">
         <NavLink to="/signin" className="nav-link">
-          Sign In
+          Login
         </NavLink>
       </li>
       <li className="nav-item active">
         <NavLink to="/signup" className="nav-link">
-          Sign Up
+          Register
         </NavLink>
       </li>
     </ul>

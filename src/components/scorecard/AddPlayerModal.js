@@ -3,37 +3,16 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 import { Typeahead } from "react-bootstrap-typeahead";
 import "react-bootstrap-typeahead/css/Typeahead.css";
 import "react-bootstrap-typeahead/css/Typeahead-bs4.css";
-import { has, startCase, toLower, find } from "lodash";
+import { has, startCase, toLower, find, isEmpty } from "lodash";
 
 class BatsmanModal extends React.Component {
   constructor(props) {
     super(props);
   }
   state = {
-    striker: {
-      id: "",
-      name: "",
-      teamName: "",
-      teamId: "",
-      onStrike: true,
-      battingOrder: 1
-    },
-    nonStriker: {
-      id: "",
-      name: "",
-      teamName: "",
-      teamId: "",
-      onStrike: true,
-      battingOrder: 2
-    },
-    bowler: {
-      id: "",
-      name: "",
-      teamName: "",
-      teamId: "",
-      onStrike: true,
-      bowlingOrder: 1
-    }
+    striker: {},
+    nonStriker: {},
+    bowler: {}
   };
 
   render() {
@@ -192,7 +171,14 @@ class BatsmanModal extends React.Component {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button color="primary">Add Players</Button>{" "}
+            <Button
+              color="primary"
+              disabled={
+                isEmpty(striker) || isEmpty(nonStriker) || isEmpty(bowler)
+              }
+            >
+              Add Players
+            </Button>{" "}
           </ModalFooter>
         </form>
       </Modal>

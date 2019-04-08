@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import moment from "moment";
 import { connect } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import {
   addScoreToMatch,
   getTeamPlayers,
@@ -478,7 +478,10 @@ class Console extends Component {
       bowler,
       nonStriker,
       bowlingSquad,
-      battingSquad
+      battingSquad,
+      auth,
+      currentInningsBatting,
+      currentInningsBowling
     } = this.props;
     const {
       bowlerModal,
@@ -494,6 +497,9 @@ class Console extends Component {
       initialPlayersModal,
       error
     } = this.state;
+    if (!auth.uid) {
+      return <Redirect to="/signIn" />;
+    }
 
     if (currentMatch) {
       if (!currentMatch[0].initialPlayersNeeded && score) {

@@ -9,9 +9,6 @@ import { firestoreConnect } from "react-redux-firebase";
 class Matches extends Component {
   render() {
     const { matches, auth } = this.props;
-    if (!auth.uid) {
-      return <Redirect to="/signIn" />;
-    }
     return (
       <div className="dashboard container">
         <div className="row">
@@ -25,7 +22,7 @@ class Matches extends Component {
                 New Match
               </a>
             </h1>
-            <LiveMatches matches={matches} />
+            <LiveMatches matches={matches} auth={auth} />
           </div>
         </div>
       </div>
@@ -34,7 +31,6 @@ class Matches extends Component {
 }
 
 const mapStateToProps = state => {
-  
   return {
     matches: state.firestore.ordered.matches,
     auth: state.firebase.auth

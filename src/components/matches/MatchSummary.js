@@ -2,7 +2,7 @@ import React from "react";
 import moment from "moment";
 import { Link } from "react-router-dom";
 
-const MatchSummary = ({ match }) => {
+const MatchSummary = ({ match, auth }) => {
   let url = `/match/${match.id}/score`;
   return (
     <div className="card mb-2">

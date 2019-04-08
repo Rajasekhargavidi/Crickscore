@@ -3,7 +3,7 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 import { Typeahead } from "react-bootstrap-typeahead";
 import "react-bootstrap-typeahead/css/Typeahead.css";
 import "react-bootstrap-typeahead/css/Typeahead-bs4.css";
-import { has, startCase, toLower, find } from "lodash";
+import { has, startCase, toLower, find, isEmpty } from "lodash";
 
 class BowlerModal extends React.Component {
   constructor(props) {
@@ -22,13 +22,10 @@ class BowlerModal extends React.Component {
       bowlingTeam,
       bowlingTeamId
     } = this.props;
+    const { bowler } = this.state;
     return (
-      <Modal
-        isOpen={openModal}
-        toggle={toggle}
-        className={this.props.className}
-      >
-        <ModalHeader toggle={toggle}>Change Bowler</ModalHeader>
+      <Modal isOpen={openModal} className={this.props.className}>
+        <ModalHeader>Change Bowler</ModalHeader>
         <form
           onSubmit={e => {
             submitBowler(e, this.state.bowler);
@@ -85,10 +82,9 @@ class BowlerModal extends React.Component {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button color="primary">Change Bowler</Button>{" "}
-            <Button color="secondary" onClick={toggle}>
-              Cancel
-            </Button>
+            <Button color="primary" disabled={isEmpty(bowler)}>
+              Change Bowler
+            </Button>{" "}
           </ModalFooter>
         </form>
       </Modal>

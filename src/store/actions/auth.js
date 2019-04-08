@@ -7,7 +7,7 @@ export const signIn = credentials => {
       .then(() => {
         dispatch({ type: "LOGIN_SUCCESS" });
       })
-      .catch(err => console.log(err));
+      .catch(err => dispatch({ type: "SIGNIN_ERROR", error: err.message }));
   };
 };
 
@@ -31,7 +31,7 @@ export const signUp = newUser => {
       .then(() => {
         dispatch({ type: "SIGNUP_SUCCESS" });
       })
-      .catch(err => console.log(err));
+      .catch(err => dispatch({ type: "SIGNUP_ERROR", error: err.message }));
   };
 };
 
