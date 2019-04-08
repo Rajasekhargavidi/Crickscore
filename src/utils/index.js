@@ -15,6 +15,8 @@ export const calculateEco = (runs, balls) => {
 };
 
 export const currentRR = (runs, balls) => {
+  console.log(runs);
+  console.log(balls);
   if (balls === undefined || runs === undefined || balls === 0 || runs === 0)
     return "INF";
   return round((runs * 6) / balls, 2);

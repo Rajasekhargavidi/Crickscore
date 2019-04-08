@@ -6,27 +6,35 @@ const MatchSummary = ({ match }) => {
   let url = `/match/${match.id}/score`;
   return (
     <div className="card mb-2">
-      <div className="card-header">
-        {match.venue}{" "}
-        <span className="float-right">
-          {moment(match.createdAt.toDate()).calendar()}
-        </span>
+      <div className="card-header text-capitalize">
+        {match.venue}
+        <span className="float-right">{match.overs} overs match</span>
       </div>
       <div className="card-body">
-        <span className="card-title">
-          {match.teamOne}
-          {match.toss === "teamOne" ? "(T)" : ""} vs {match.teamTwo}
-          {match.toss === "teamTwo" ? "(T)" : ""}
+        <span className="card-title score-values">
+          {match.teamOne} <span className="text-uppercase">vs</span>{" "}
+          {match.teamTwo}
         </span>
+        <div className="score-label">
+          {moment(match.createdAt.toDate()).calendar()}
+        </div>
+        <div className="score-sub-label">{match.tossInformation}</div>
+        <div>{match.statusType}</div>
+        <hr />
         <div className="card-text">
-          <div>
-            {match.batting === "teamOne" ? match.teamOne : match.teamTwo} -{" "}
-            {match.firstInningsRuns} / {match.firstInningsWickets} (
-            {match.firstInningsOvers} overs)
+          <div className="score-values">{match.firstBatting}</div>
+          <div className="score-sub-text">
+            {match.firstInningsRuns} / {match.firstInningsWickets}
+            <span className="float-right">
+              {match.firstInningsOvers} / {match.overs} overs
+            </span>
           </div>
-          <div>
-            {match.batting === "teamOne" ? match.teamTwo : match.teamOne} - Yet
-            to bat
+          <div className="score-values">{match.secondBatting}</div>
+          <div className="score-sub-text">
+            {match.secondInningsRuns} / {match.secondInningsWickets}
+            <span className="float-right">
+              {match.secondInningsOvers} / {match.overs} overs
+            </span>
           </div>
         </div>
       </div>

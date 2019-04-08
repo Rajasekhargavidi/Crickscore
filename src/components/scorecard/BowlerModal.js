@@ -78,7 +78,8 @@ class BowlerModal extends React.Component {
                   allowNew={true}
                   options={bowlingSquad !== undefined ? bowlingSquad : []}
                   filterBy={["name"]}
-                  placeholder="Choose bowler..."
+                  placeholder="Type player name..."
+                  newSelectionPrefix="Choose : "
                 />
               </div>
             </div>

@@ -45,12 +45,17 @@ class BatsmanModal extends React.Component {
       battingTeam,
       battingTeamId,
       bowlingTeam,
-      bowlingTeamId
+      bowlingTeamId,
+      currentMatch
     } = this.props;
     const { striker, nonStriker, bowler } = this.state;
     return (
       <Modal isOpen={openModal} className={this.props.className}>
-        <ModalHeader>Select Striker, Non Striker and Bowler</ModalHeader>
+        <ModalHeader>
+          <div className="score-label">
+            {currentMatch.teamOne} vs {currentMatch.teamTwo}
+          </div>
+        </ModalHeader>
         <form
           onSubmit={e => {
             submitInitialPlayers(e, striker, nonStriker, bowler);
@@ -96,7 +101,7 @@ class BatsmanModal extends React.Component {
                   allowNew={true}
                   options={battingSquad !== undefined ? battingSquad : []}
                   filterBy={["name"]}
-                  placeholder="Choose striker..."
+                  placeholder="Type player name..."
                 />
               </div>
             </div>
@@ -136,7 +141,7 @@ class BatsmanModal extends React.Component {
                   allowNew={true}
                   options={battingSquad !== undefined ? battingSquad : []}
                   filterBy={["name"]}
-                  placeholder="Choose non striker..."
+                  placeholder="Type player name..."
                 />
               </div>
             </div>
@@ -181,7 +186,7 @@ class BatsmanModal extends React.Component {
                   allowNew={true}
                   options={bowlingSquad !== undefined ? bowlingSquad : []}
                   filterBy={["name"]}
-                  placeholder="Choose bowler..."
+                  placeholder="Type player name..."
                 />
               </div>
             </div>

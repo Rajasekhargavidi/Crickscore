@@ -54,7 +54,8 @@ class Console extends Component {
     currentOutJson: {},
     battingCollection: "firstInningsBatting",
     bowlingCollection: "firstInningsBowling",
-    scoreCollection: "firstInningsScore"
+    scoreCollection: "firstInningsScore",
+    error: ""
   };
 
   componentDidUpdate(prevProps) {
@@ -124,7 +125,8 @@ class Console extends Component {
     localEr[localIndex].selected = true;
     this.setState({
       ER: localEr,
-      currentRunJson: eachRun
+      currentRunJson: eachRun,
+      error: ""
     });
   };
   handleExtra = eachExtra => {
@@ -175,179 +177,184 @@ class Console extends Component {
       currentOutJson,
       scoreCollection
     } = this.state;
-
-    let payload = {};
-    let localBowler = bowler;
-    let localStriker = striker;
-    let localNonStriker = nonStriker;
-    let currentBall = parseInt(score.ball);
-    let nextBallCounted = true;
-    let runs = 0;
-    let finalRuns = 0;
-    let totalWickets = score.totalWickets;
-    let currentEvent = "";
-    let lastSixBalls = score.lastSixBalls;
-    let extra = false;
-    let extraType = "";
-    let extraRun = 0;
-    let out = false;
-    let outType = "";
-    let batsmanRun = true;
-    let batsmanBall = true;
-    let bowlerRun = true;
-    let bowlerBall = true;
-    let bowlerWicket = false;
-    let boundary = false;
-    let overCompleted = false;
-    if (!isEmpty(currentRunJson)) {
-      runs = parseInt(currentRunJson.run);
-      finalRuns += runs;
-      currentEvent += currentRunJson.event;
-      if (score.nextBallCounted) {
-        currentBall++;
-      }
-    }
-    let currentOver = calculateOvers(currentBall);
-    if (!isEmpty(currentExtraJson)) {
-      if (currentExtraJson.extra) {
-        if (currentExtraJson.extraRun) {
-          finalRuns++;
+    if (isEmpty(currentRunJson)) {
+      this.setState({ error: "Select runs first" });
+    } else {
+      let localBowler = bowler;
+      let localStriker = striker;
+      let localNonStriker = nonStriker;
+      let currentBall = parseInt(score.ball);
+      let nextBallCounted = true;
+      let runs = 0;
+      let finalRuns = 0;
+      let totalWickets = score.totalWickets;
+      let currentEvent = "";
+      let lastSixBalls = score.lastSixBalls;
+      let extra = false;
+      let extraType = "";
+      let extraRun = 0;
+      let out = false;
+      let outType = "";
+      let batsmanRun = true;
+      let batsmanBall = true;
+      let bowlerRun = true;
+      let bowlerBall = true;
+      let bowlerWicket = false;
+      let boundary = false;
+      let overCompleted = false;
+      if (!isEmpty(currentRunJson)) {
+        runs = parseInt(currentRunJson.run);
+        finalRuns += runs;
+        currentEvent += currentRunJson.event;
+        if (score.nextBallCounted) {
+          currentBall++;
         }
-        if (!currentExtraJson.ballCounted) {
-          nextBallCounted = false;
+      }
+      let currentOver = calculateOvers(currentBall);
+      if (!isEmpty(currentExtraJson)) {
+        if (currentExtraJson.extra) {
+          if (currentExtraJson.extraRun) {
+            finalRuns++;
+          }
+          if (!currentExtraJson.ballCounted) {
+            nextBallCounted = false;
+          }
+          currentEvent += currentExtraJson.event;
+          extra = currentExtraJson.extra;
+          extraType = currentExtraJson.id;
+          extraRun = currentExtraJson.extraRun ? 1 : 0;
+          batsmanBall = currentExtraJson.batsmanBall;
+          batsmanRun = currentExtraJson.batsmanRun;
+          bowlerBall = currentExtraJson.bowlerBall;
+          bowlerRun = currentExtraJson.bowlerRun;
         }
-        currentEvent += currentExtraJson.event;
-        extra = currentExtraJson.extra;
-        extraType = currentExtraJson.id;
-        extraRun = currentExtraJson.extraRun;
-        batsmanBall = currentExtraJson.batsmanBall;
-        batsmanRun = currentExtraJson.batsmanRun;
-        bowlerBall = currentExtraJson.bowlerBall;
-        bowlerRun = currentExtraJson.bowlerRun;
       }
-    }
 
-    if (!isEmpty(currentOutJson)) {
-      out = currentOutJson.out;
-      outType = currentOutJson.id;
-      currentEvent += currentOutJson.event;
-      bowlerWicket = currentOutJson.bowlerWicket;
-      if (out) {
-        totalWickets++;
+      if (!isEmpty(currentOutJson)) {
+        out = currentOutJson.out;
+        outType = currentOutJson.id;
+        currentEvent += currentOutJson.event;
+        bowlerWicket = currentOutJson.bowlerWicket;
+        if (out) {
+          totalWickets++;
+        }
       }
-    }
-    currentEvent =
-      currentEvent.length > 1 ? replace(currentEvent, ".", "") : currentEvent;
-    if (lastSixBalls.length === 6) {
-      lastSixBalls.pop();
-    }
-    lastSixBalls.unshift({
-      over: currentOver,
-      event: currentEvent
-    });
-    let totalRuns = score.totalRuns + finalRuns;
-    let CRR = currentRR(totalRuns, currentBall);
-    let EXP = expectedRuns(CRR, currentMatch[0].overs);
+      currentEvent =
+        currentEvent.length > 1 ? replace(currentEvent, ".", "") : currentEvent;
+      if (lastSixBalls.length === 6) {
+        lastSixBalls.pop();
+      }
+      lastSixBalls.unshift({
+        over: currentOver,
+        event: currentEvent
+      });
+      let totalRuns = score.totalRuns + finalRuns;
+      let CRR = currentRR(totalRuns, currentBall);
+      let EXP = expectedRuns(CRR, currentMatch[0].overs);
 
-    if (batsmanBall) {
-      localStriker = { ...localStriker, balls: localStriker.balls + 1 };
-    }
-    if (batsmanRun) {
-      localStriker = { ...localStriker, runs: localStriker.runs + runs };
-      if (runs === 0) {
-        localStriker = { ...localStriker, dots: localStriker.dots + 1 };
-        localBowler = { ...localBowler, dots: localBowler.dots + 1 };
+      if (batsmanBall) {
+        localStriker = { ...localStriker, balls: localStriker.balls + 1 };
       }
-      if (runs === 4) {
-        localStriker = { ...localStriker, fours: localStriker.fours + 1 };
-        localBowler = { ...localBowler, fours: localBowler.fours + 1 };
-        boundary = true;
+      if (batsmanRun) {
+        localStriker = { ...localStriker, runs: localStriker.runs + runs };
+        if (runs === 0) {
+          localStriker = { ...localStriker, dots: localStriker.dots + 1 };
+          localBowler = { ...localBowler, dots: localBowler.dots + 1 };
+        }
+        if (runs === 4) {
+          localStriker = { ...localStriker, fours: localStriker.fours + 1 };
+          localBowler = { ...localBowler, fours: localBowler.fours + 1 };
+          boundary = true;
+        }
+        if (runs === 6) {
+          localStriker = { ...localStriker, sixes: localStriker.sixes + 1 };
+          localBowler = { ...localBowler, sixes: localBowler.sixes + 1 };
+          boundary = true;
+        }
       }
-      if (runs === 6) {
-        localStriker = { ...localStriker, sixes: localStriker.sixes + 1 };
-        localBowler = { ...localBowler, sixes: localBowler.sixes + 1 };
-        boundary = true;
+      if (bowlerBall) {
+        localBowler = { ...localBowler, balls: localBowler.balls + 1 };
       }
-    }
-    if (bowlerBall) {
-      localBowler = { ...localBowler, balls: localBowler.balls + 1 };
-    }
-    if (bowlerRun) {
-      localBowler = { ...localBowler, runs: localBowler.runs + finalRuns };
-    }
-    if (bowlerWicket) {
-      localBowler = { ...localBowler, wickets: localBowler.wickets + 1 };
-    }
-    localStriker = {
-      ...localStriker,
-      sr: calculateSR(localStriker.runs, localStriker.balls)
-    };
-    localBowler = { ...localBowler, overs: calculateOvers(localBowler.balls) };
-    localBowler = {
-      ...localBowler,
-      eco: calculateEco(localBowler.runs, localBowler.balls)
-    };
-    if (extraType === "wd") {
-      localBowler = { ...localBowler, wides: localBowler.wides + 1 };
-    }
-    if (extraType === "nb") {
-      localBowler = { ...localBowler, noBalls: localBowler.noBalls + 1 };
-    }
-    if (extraType === "b") {
-      localBowler = { ...localBowler, byes: localBowler.byes + 1 };
-    }
-    if (out && whoIsOut.id === localStriker.id) {
+      if (bowlerRun) {
+        localBowler = { ...localBowler, runs: localBowler.runs + finalRuns };
+      }
+      if (bowlerWicket) {
+        localBowler = { ...localBowler, wickets: localBowler.wickets + 1 };
+      }
       localStriker = {
         ...localStriker,
-        out: true,
-        howOut: bowlerWicket ? localBowler.name : "run out",
-        onStrike: false
+        sr: calculateSR(localStriker.runs, localStriker.balls)
       };
-    }
-    if (out && whoIsOut.id === localNonStriker.id) {
-      localNonStriker = {
-        ...localNonStriker,
-        out: true,
-        howOut: "run out",
-        onStrike: false
+      localBowler = {
+        ...localBowler,
+        overs: calculateOvers(localBowler.balls)
       };
-    }
-    if (currentBall !== 0 && currentBall % 6 === 0 && !extra) {
-      overCompleted = true;
-    }
-    payload = {
-      ...payload,
-      runs,
-      lastSixBalls,
-      currentEvent,
-      ball: currentBall,
-      CRR,
-      EXP,
-      nextBallCounted,
-      currentOver,
-      totalRuns,
-      totalWickets,
-      extra,
-      extraType,
-      out,
-      outType,
-      extraRun,
-      whoIsOut,
-      striker: localStriker,
-      nonStriker: localNonStriker,
-      bowler: localBowler,
-      boundary,
-      newBowler: {},
-      newBatsman: {},
-      overCompleted,
-      changeStrike: false,
-      changeBowler: false,
-      endInnings: false
-    };
-    this.props.addScoreToMatch(payload, scoreCollection);
-    this.handleSubmitUI();
-    if (currentBall === parseInt(currentMatch[0].overs) * 6 && !extra) {
-      this.handleInnings();
+      localBowler = {
+        ...localBowler,
+        eco: calculateEco(localBowler.runs, localBowler.balls)
+      };
+      if (extraType === "wd") {
+        localBowler = { ...localBowler, wides: localBowler.wides + 1 };
+      }
+      if (extraType === "nb") {
+        localBowler = { ...localBowler, noBalls: localBowler.noBalls + 1 };
+      }
+      if (extraType === "b") {
+        localBowler = { ...localBowler, byes: localBowler.byes + 1 };
+      }
+      if (out && whoIsOut.id === localStriker.id) {
+        localStriker = {
+          ...localStriker,
+          out: true,
+          howOut: bowlerWicket ? localBowler.name : "run out",
+          onStrike: false
+        };
+      }
+      if (out && whoIsOut.id === localNonStriker.id) {
+        localNonStriker = {
+          ...localNonStriker,
+          out: true,
+          howOut: "run out",
+          onStrike: false
+        };
+      }
+      if (currentBall !== 0 && currentBall % 6 === 0 && !extra) {
+        overCompleted = true;
+      }
+      let payload = {
+        runs,
+        lastSixBalls,
+        currentEvent,
+        ball: currentBall,
+        CRR,
+        EXP,
+        nextBallCounted,
+        currentOver,
+        totalRuns,
+        totalWickets,
+        extra,
+        extraType,
+        extraRun,
+        out,
+        outType,
+        whoIsOut,
+        striker: localStriker,
+        nonStriker: localNonStriker,
+        bowler: localBowler,
+        boundary,
+        newBowler: {},
+        newBatsman: {},
+        overCompleted,
+        changeStrike: false,
+        changeBowler: false,
+        endInnings: false,
+        finalRuns
+      };
+      this.props.addScoreToMatch(payload, scoreCollection);
+      this.handleSubmitUI();
+      if (currentBall === parseInt(currentMatch[0].overs) * 6 && !extra) {
+        this.handleInnings();
+      }
     }
   };
   handleStrike = () => {
@@ -363,6 +370,9 @@ class Console extends Component {
     e.preventDefault();
     const { currentInningsBowling, score } = this.props;
     const { scoreCollection } = this.state;
+    console.log("handleBowlerChange");
+    console.log(currentInningsBowling);
+    console.log(scoreCollection);
     var alreadyExists = find(currentInningsBowling, { id: bowler.id });
     if (alreadyExists === undefined) {
       this.props.addBowler({
@@ -435,7 +445,7 @@ class Console extends Component {
     lastSixBalls.map((ball, i) => (
       <div key={i} className="col-2 text-center p-1">
         <div className="score-label">{ball.over}</div>
-        <div className="ball-values bg-white border border-light text-uppercase">
+        <div className="ball-values bg-white border border-danger text-uppercase last-six-balls">
           {ball.event}
         </div>
       </div>
@@ -481,7 +491,8 @@ class Console extends Component {
       battingTeamId,
       bowlingTeam,
       bowlingTeamId,
-      initialPlayersModal
+      initialPlayersModal,
+      error
     } = this.state;
 
     if (currentMatch) {
@@ -492,6 +503,12 @@ class Console extends Component {
             <div className="m-3 border-bottom border-primary pb-3 score-label">
               {currentMatch[0].teamOne} vs {currentMatch[0].teamTwo} at{" "}
               {currentMatch[0].venue}
+              <span className="float-right text-danger score-values">
+                {currentMatch[0].currentInnings === "FIRST_INNINGS"
+                  ? "1st"
+                  : "2nd"}{" "}
+                Inn
+              </span>
             </div>
             {/* top panel */}
             <div className="container">
@@ -547,24 +564,12 @@ class Console extends Component {
                   </div>
                 </div>
               </div>
-              <div className="row my-1 px-4">
-                <div className="col-3 text-uppercase bg-danger text-light innings-col">
-                  {currentMatch[0].currentInnings === "FIRST_INNINGS"
-                    ? "1st"
-                    : "2nd"}{" "}
-                  Inn
-                </div>
-                <div className="col-9 bg-light">
-                  <div className="score-label text-uppercase">exp runs</div>
-                  <div className="score-values">{score.EXP}</div>
-                </div>
-              </div>
               <div className="row my-1 py-1 px-4">
                 {this.lastSixBalls(score.lastSixBalls)}
               </div>
             </div>
             {/* runs panel */}
-            <div className="bg-secondary text-white p-3">
+            <div className="bg-light text-dark p-3">
               <div className="row">
                 <div className="score-label text-center text-uppercase col-12 mb-2">
                   runs
@@ -586,6 +591,7 @@ class Console extends Component {
                   ))}
                 </div>
               </div>
+              {error && <div className="error">{error}</div>}
               <hr />
               <div className="row text-center">
                 <div className="col">
@@ -721,6 +727,7 @@ class Console extends Component {
             bowlingTeamId={bowlingTeamId}
             battingTeam={battingTeam}
             battingTeamId={battingTeamId}
+            currentMatch={currentMatch[0]}
           />
         );
       }
@@ -740,6 +747,7 @@ const mapStateToProps = state => {
   let nonStriker = {};
   let currentMatch = state.firestore.ordered.matches;
   let score;
+
   let currentInningsBowling, currentInningsBatting;
   if (currentMatch) {
     if (currentMatch[0].currentInnings === "FIRST_INNINGS") {
@@ -759,17 +767,15 @@ const mapStateToProps = state => {
       nonStriker = score.nonStriker;
 
       if (score.runs % 2 !== 0) {
-        if (score.ball % 6 !== 0) {
-          striker = score.nonStriker;
-          nonStriker = score.striker;
-        }
-      } else {
-        if (score.ball !== 0 && score.ball % 6 === 0 && !score.extra) {
-          striker = score.nonStriker;
-          nonStriker = score.striker;
-        }
+        let tempStriker = striker;
+        striker = nonStriker;
+        nonStriker = tempStriker;
       }
-
+      if (score.ball !== 0 && score.ball % 6 === 0 && !score.extra) {
+        let tempStriker = striker;
+        striker = nonStriker;
+        nonStriker = tempStriker;
+      }
       if (!isEmpty(score.newBowler)) {
         bowler = score.newBowler;
       }

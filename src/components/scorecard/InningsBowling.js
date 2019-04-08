@@ -6,7 +6,7 @@ const InningsBowling = ({ players }) => {
     <Table responsive size="sm">
       <thead>
         <tr>
-          <th>Bowler</th>
+          <th width="40%">Bowler</th>
           <th>Ovs</th>
           <th>R</th>
           <th>Wks</th>
@@ -19,8 +19,10 @@ const InningsBowling = ({ players }) => {
       <tbody>
         {players &&
           players.map((player, index) => (
-            <tr key={index}>
-              <th scope="row">{player.name}</th>
+            <tr key={index} className="text-center">
+              <th scope="row" className="text-left">
+                {player.name}
+              </th>
               <td>{player.overs}</td>
               <td>{player.runs}</td>
               <td>{player.wickets}</td>

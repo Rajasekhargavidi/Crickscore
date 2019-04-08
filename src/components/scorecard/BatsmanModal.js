@@ -78,7 +78,8 @@ class BatsmanModal extends React.Component {
                   allowNew={true}
                   options={battingSquad !== undefined ? battingSquad : []}
                   filterBy={["name"]}
-                  placeholder="Choose batsman..."
+                  placeholder="Type player name..."
+                  newSelectionPrefix="Choose : "
                 />
               </div>
             </div>

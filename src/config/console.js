@@ -2,10 +2,10 @@ export const extrasJson = [
   {
     type: "wide",
     style:
-      "col border border-dark shadow bg-white mx-5 my-1 text-capitalize text-dark",
+      "col border border-dark shadow bg-white mx-3 my-1 text-capitalize text-dark",
     selected: false,
     selectedStyle:
-      "col border border-dark shadow bg-success text-white mx-5 my-1 text-capitalize",
+      "col border border-dark shadow bg-success text-white mx-3 my-1 text-capitalize",
     extraRun: true,
     ballCounted: false,
     event: "wd",
@@ -21,10 +21,10 @@ export const extrasJson = [
   {
     type: "no ball",
     style:
-      "col border border-dark shadow bg-white mx-5 my-1 text-capitalize text-dark",
+      "col border border-dark shadow bg-white mx-3 my-1 text-capitalize text-dark",
     selected: false,
     selectedStyle:
-      "col border border-dark shadow bg-success text-white mx-5 my-1 text-capitalize",
+      "col border border-dark shadow bg-success text-white mx-3 my-1 text-capitalize",
     extraRun: true,
     ballCounted: false,
     event: "nb",
@@ -40,10 +40,10 @@ export const extrasJson = [
   {
     type: "bye",
     style:
-      "col border border-dark shadow bg-white mx-5 my-1 text-capitalize text-dark",
+      "col border border-dark shadow bg-white mx-3 my-1 text-capitalize text-dark",
     selected: false,
     selectedStyle:
-      "col border border-dark shadow bg-success text-white mx-5 my-1 text-capitalize",
+      "col border border-dark shadow bg-success text-white mx-3 my-1 text-capitalize",
     extraRun: false,
     ballCounted: true,
     event: "b",
@@ -59,10 +59,10 @@ export const extrasJson = [
   {
     type: "leg bye",
     style:
-      "col border border-dark shadow bg-white mx-5 my-1 text-capitalize text-dark",
+      "col border border-dark shadow bg-white mx-3 my-1 text-capitalize text-dark",
     selected: false,
     selectedStyle:
-      "col border border-dark shadow bg-success text-white mx-5 my-1 text-capitalize",
+      "col border border-dark shadow bg-success text-white mx-3 my-1 text-capitalize",
     extraRun: false,
     ballCounted: true,
     event: "lb",
@@ -78,10 +78,10 @@ export const extrasJson = [
   {
     type: "no extra",
     style:
-      "col border border-dark shadow bg-white mx-5 my-1 text-capitalize text-dark",
+      "col border border-dark shadow bg-white mx-3 my-1 text-capitalize text-dark",
     selected: false,
     selectedStyle:
-      "col border border-dark shadow bg-success text-white mx-5 my-1 text-capitalize",
+      "col border border-dark shadow bg-success text-white mx-3 my-1 text-capitalize",
     extraRun: false,
     ballCounted: true,
     event: "",
@@ -98,70 +98,70 @@ export const extrasJson = [
 export const runsJson = [
   {
     run: 0,
-    style: "col current-run bg-white text-dark align-middle mx-2 p-1",
+    style: "col current-run bg-white text-dark align-middle mx-1 p-1",
     selected: false,
     selectedStyle:
-      "col current-run bg-success text-white align-middle mx-2 p-1",
+      "col current-run bg-success text-white align-middle mx-1 p-1",
     id: "zero",
     event: ".",
     disable: ["bye", "legBye"]
   },
   {
     run: 1,
-    style: "col current-run bg-white text-dark align-middle mx-2 p-1",
+    style: "col current-run bg-white text-dark align-middle mx-1 p-1",
     selected: false,
     selectedStyle:
-      "col current-run bg-success text-white align-middle mx-2 p-1",
+      "col current-run bg-success text-white align-middle mx-1 p-1",
     id: "one",
     event: "1",
     disable: []
   },
   {
     run: 2,
-    style: "col current-run bg-white text-dark align-middle mx-2 p-1",
+    style: "col current-run bg-white text-dark align-middle mx-1 p-1",
     selected: false,
     selectedStyle:
-      "col current-run bg-success text-white align-middle mx-2 p-1",
+      "col current-run bg-success text-white align-middle mx-1 p-1",
     id: "two",
     event: "2",
     disable: []
   },
   {
     run: 3,
-    style: "col current-run bg-white text-dark align-middle mx-2 p-1",
+    style: "col current-run bg-white text-dark align-middle mx-1 p-1",
     selected: false,
     selectedStyle:
-      "col current-run bg-success text-white align-middle mx-2 p-1",
+      "col current-run bg-success text-white align-middle mx-1 p-1",
     id: "three",
     event: "3",
     disable: []
   },
   {
     run: 4,
-    style: "col current-run bg-white text-dark align-middle mx-2 p-1",
+    style: "col current-run bg-white text-dark align-middle mx-1 p-1",
     selected: false,
     selectedStyle:
-      "col current-run bg-success text-white align-middle mx-2 p-1",
+      "col current-run bg-success text-white align-middle mx-1 p-1",
     id: "four",
     event: "4",
     disable: []
   },
   {
     run: 5,
-    style: "col current-run bg-white text-dark align-middle mx-2 p-1",
+    style: "col current-run bg-white text-dark align-middle mx-1 p-1",
     selected: false,
     selectedStyle:
-      "col current-run bg-success text-white align-middle mx-2 p-1",
+      "col current-run bg-success text-white align-middle mx-1 p-1",
     id: "five",
     event: "5",
     disable: []
   },
   {
     run: 6,
-    style: "col current-run bg-white text-dark align-middle mx-2 p-1",
+    style: "col current-run bg-white text-dark align-middle mx-1 p-1",
     selected: false,
     selectedStyle:
-      "col current-run bg-success text-white align-middle mx-2 p-1",
+      "col current-run bg-success text-white align-middle mx-1 p-1",
     id: "six",
     event: "6",
     disable: []
@@ -172,10 +172,10 @@ export const outJson = [
   {
     type: "out",
     style:
-      "col border border-dark shadow bg-white mx-5 my-1 text-capitalize text-dark",
+      "col border border-dark shadow bg-white mx-3 my-1 text-capitalize text-dark",
     selected: false,
     selectedStyle:
-      "col border border-dark shadow bg-success text-white mx-5 my-1 text-capitalize",
+      "col border border-dark shadow bg-success text-white mx-3 my-1 text-capitalize",
     event: "wk",
     openModal: false,
     disabled: false,
@@ -186,10 +186,10 @@ export const outJson = [
   {
     type: "run out",
     style:
-      "col border border-dark shadow bg-white mx-5 my-1 text-capitalize text-dark",
+      "col border border-dark shadow bg-white mx-3 my-1 text-capitalize text-dark",
     selected: false,
     selectedStyle:
-      "col border border-dark shadow bg-success text-white mx-5 my-1 text-capitalize",
+      "col border border-dark shadow bg-success text-white mx-3 my-1 text-capitalize",
     event: "rwk",
     openModal: true,
     disabled: false,
@@ -200,10 +200,10 @@ export const outJson = [
   {
     type: "retired out",
     style:
-      "col border border-dark shadow bg-white mx-5 my-1 text-capitalize text-dark",
+      "col border border-dark shadow bg-white mx-3 my-1 text-capitalize text-dark",
     selected: false,
     selectedStyle:
-      "col border border-dark shadow bg-success text-white mx-5 my-1 text-capitalize",
+      "col border border-dark shadow bg-success text-white mx-3 my-1 text-capitalize",
     event: "rewk",
     openModal: true,
     disabled: false,
@@ -214,10 +214,10 @@ export const outJson = [
   {
     type: "not out",
     style:
-      "col border border-dark shadow bg-white mx-5 my-1 text-capitalize text-dark",
+      "col border border-dark shadow bg-white mx-3 my-1 text-capitalize text-dark",
     selected: false,
     selectedStyle:
-      "col border border-dark shadow bg-success text-white mx-5 my-1 text-capitalize",
+      "col border border-dark shadow bg-success text-white mx-3 my-1 text-capitalize",
     event: "",
     openModal: false,
     disabled: false,

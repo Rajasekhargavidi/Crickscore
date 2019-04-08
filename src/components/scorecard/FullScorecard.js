@@ -11,6 +11,8 @@ import InningsBatting from "./InningsBatting";
 import InningsBowling from "./InningsBowling";
 import BallByBall from "./BallByBall";
 
+import { currentRR } from "../../utils";
+
 import {
   TabContent,
   TabPane,
@@ -60,7 +62,7 @@ class FullScorecard extends Component {
       return (
         <div className="container mt-5">
           <a href="/matches">All Matches</a>
-          <h3 classs="score-label">
+          <h3 className="score-label">
             {currentMatch[0].teamOne} vs {currentMatch[0].teamTwo} at{" "}
             {currentMatch[0].venue}
           </h3>
@@ -112,18 +114,30 @@ class FullScorecard extends Component {
                 {currentMatch[0].firstBatting}
                 <small className="float-right">1st Inn</small>
               </h3>
-              <InningsBatting players={firstInningsBatting} />
-              <h3>{currentMatch[0].firstBowling}</h3>
+              <InningsBatting
+                players={firstInningsBatting}
+                finalScore={`${currentMatch[0].firstInningsRuns}/${
+                  currentMatch[0].firstInningsWickets
+                }(${currentMatch[0].firstInningsOvers}/${
+                  currentMatch[0].overs
+                }, RR: 3.55)`}
+              />
               <InningsBowling players={firstInningsBowling} />
 
               {secondInningsBatting && secondInningsBatting.length > 0 ? (
-                <div>
+                <div className="border-top pt-5 border-primary">
                   <h3>
                     {currentMatch[0].firstBowling}
                     <small className="float-right">2nd Inn</small>
                   </h3>
-                  <InningsBatting players={secondInningsBatting} />
-                  <h3>{currentMatch[0].firstBatting}</h3>
+                  <InningsBatting
+                    players={secondInningsBatting}
+                    finalScore={`${currentMatch[0].secondInningsRuns}/${
+                      currentMatch[0].secondInningsWickets
+                    }(${currentMatch[0].secondInningsOvers}/${
+                      currentMatch[0].overs
+                    }, RR: 3.55)`}
+                  />
                   <InningsBowling players={secondInningsBowling} />
                 </div>
               ) : (
@@ -235,8 +249,7 @@ export default compose(
       subcollections: [
         {
           collection: "secondInningsScore",
-          orderBy: ["createdAt", "desc"],
-          limit: 1
+          orderBy: ["createdAt", "desc"]
         }
       ],
       storeAs: "secondInningsScore"
