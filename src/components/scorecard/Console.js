@@ -428,6 +428,17 @@ class Console extends Component {
     };
     this.props.updateMatch(match);
   };
+  handleEndMatch = () => {
+    const { currentMatch } = this.props;
+    let match = {
+      ...currentMatch[0],
+      statusType: 4,
+      status: "MATCH_ENDED",
+      currentInnings: "SECOND_INNINGS",
+      initialPlayersNeeded: false
+    };
+    this.props.updateMatch(match);
+  };
 
   handleEndMatch = () => {
     const { currentMatch } = this.props;
@@ -602,45 +613,41 @@ class Console extends Component {
               <div className="row text-center">
                 <div className="col">
                   <h3 className="score-label">extra</h3>
-                  <div className="row">
-                    {EE.map((eachExtra, index) => (
-                      <div
-                        key={index}
-                        onClick={() => {
-                          this.handleExtra(eachExtra);
-                        }}
-                        id={eachExtra.id}
-                        className={
-                          eachExtra.selected
-                            ? eachExtra.selectedStyle
-                            : eachExtra.style
-                        }
-                      >
-                        {eachExtra.type}
-                      </div>
-                    ))}
-                  </div>
+
+                  {EE.map((eachExtra, index) => (
+                    <div
+                      key={index}
+                      onClick={() => {
+                        this.handleExtra(eachExtra);
+                      }}
+                      id={eachExtra.id}
+                      className={
+                        eachExtra.selected
+                          ? eachExtra.selectedStyle
+                          : eachExtra.style
+                      }
+                    >
+                      {eachExtra.type}
+                    </div>
+                  ))}
                 </div>
                 <div className="col">
                   <h3 className="score-label">wicket</h3>
-                  <div className="row">
-                    {WK.map((eachOut, index) => (
-                      <div
-                        key={index}
-                        onClick={() => {
-                          this.handleOut(eachOut);
-                        }}
-                        id={eachOut.id}
-                        className={
-                          eachOut.selected
-                            ? eachOut.selectedStyle
-                            : eachOut.style
-                        }
-                      >
-                        {eachOut.type}
-                      </div>
-                    ))}
-                  </div>
+
+                  {WK.map((eachOut, index) => (
+                    <div
+                      key={index}
+                      onClick={() => {
+                        this.handleOut(eachOut);
+                      }}
+                      id={eachOut.id}
+                      className={
+                        eachOut.selected ? eachOut.selectedStyle : eachOut.style
+                      }
+                    >
+                      {eachOut.type}
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -673,12 +680,22 @@ class Console extends Component {
                   </button>
                 </div>
                 <div className="col">
-                  <button
-                    onClick={this.handleInnings}
-                    className="btn btn-danger text-uppercase"
-                  >
-                    end innings
-                  </button>
+                  {currentMatch[0].currentInnings === "FIRST_INNINGS" && (
+                    <button
+                      onClick={this.handleInnings}
+                      className="btn btn-danger text-uppercase"
+                    >
+                      end innings
+                    </button>
+                  )}
+                  {currentMatch[0].currentInnings === "SECOND_INNINGS" && (
+                    <button
+                      onClick={this.handleEndMatch}
+                      className="btn btn-danger text-uppercase"
+                    >
+                      end match
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

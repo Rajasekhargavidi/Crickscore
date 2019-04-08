@@ -2,10 +2,10 @@ export const extrasJson = [
   {
     type: "wide",
     style:
-      "col border border-dark shadow bg-white mx-3 my-1 text-capitalize text-dark",
+      "col border border-dark shadow bg-white m-1 text-capitalize text-dark",
     selected: false,
     selectedStyle:
-      "col border border-dark shadow bg-success text-white mx-3 my-1 text-capitalize",
+      "col border border-dark shadow bg-success text-white m-1 text-capitalize",
     extraRun: true,
     ballCounted: false,
     event: "wd",
@@ -21,10 +21,10 @@ export const extrasJson = [
   {
     type: "no ball",
     style:
-      "col border border-dark shadow bg-white mx-3 my-1 text-capitalize text-dark",
+      "col border border-dark shadow bg-white m-1 text-capitalize text-dark",
     selected: false,
     selectedStyle:
-      "col border border-dark shadow bg-success text-white mx-3 my-1 text-capitalize",
+      "col border border-dark shadow bg-success text-white m-1 text-capitalize",
     extraRun: true,
     ballCounted: false,
     event: "nb",
@@ -40,10 +40,10 @@ export const extrasJson = [
   {
     type: "bye",
     style:
-      "col border border-dark shadow bg-white mx-3 my-1 text-capitalize text-dark",
+      "col border border-dark shadow bg-white m-1 text-capitalize text-dark",
     selected: false,
     selectedStyle:
-      "col border border-dark shadow bg-success text-white mx-3 my-1 text-capitalize",
+      "col border border-dark shadow bg-success text-white m-1 text-capitalize",
     extraRun: false,
     ballCounted: true,
     event: "b",
@@ -59,10 +59,10 @@ export const extrasJson = [
   {
     type: "leg bye",
     style:
-      "col border border-dark shadow bg-white mx-3 my-1 text-capitalize text-dark",
+      "col border border-dark shadow bg-white m-1 text-capitalize text-dark",
     selected: false,
     selectedStyle:
-      "col border border-dark shadow bg-success text-white mx-3 my-1 text-capitalize",
+      "col border border-dark shadow bg-success text-white m-1 text-capitalize",
     extraRun: false,
     ballCounted: true,
     event: "lb",
@@ -78,10 +78,10 @@ export const extrasJson = [
   {
     type: "no extra",
     style:
-      "col border border-dark shadow bg-white mx-3 my-1 text-capitalize text-dark",
+      "col border border-dark shadow bg-white m-1 text-capitalize text-dark",
     selected: false,
     selectedStyle:
-      "col border border-dark shadow bg-success text-white mx-3 my-1 text-capitalize",
+      "col border border-dark shadow bg-success text-white m-1 text-capitalize",
     extraRun: false,
     ballCounted: true,
     event: "",
@@ -172,10 +172,10 @@ export const outJson = [
   {
     type: "out",
     style:
-      "col border border-dark shadow bg-white mx-3 my-1 text-capitalize text-dark",
+      "col border border-dark shadow bg-white m-1 text-capitalize text-dark",
     selected: false,
     selectedStyle:
-      "col border border-dark shadow bg-success text-white mx-3 my-1 text-capitalize",
+      "col border border-dark shadow bg-success text-white m-1 text-capitalize",
     event: "wk",
     openModal: false,
     disabled: false,
@@ -186,10 +186,10 @@ export const outJson = [
   {
     type: "run out",
     style:
-      "col border border-dark shadow bg-white mx-3 my-1 text-capitalize text-dark",
+      "col border border-dark shadow bg-white m-1 text-capitalize text-dark",
     selected: false,
     selectedStyle:
-      "col border border-dark shadow bg-success text-white mx-3 my-1 text-capitalize",
+      "col border border-dark shadow bg-success text-white m-1 text-capitalize",
     event: "rwk",
     openModal: true,
     disabled: false,
@@ -200,10 +200,10 @@ export const outJson = [
   {
     type: "retired out",
     style:
-      "col border border-dark shadow bg-white mx-3 my-1 text-capitalize text-dark",
+      "col border border-dark shadow bg-white m-1 text-capitalize text-dark",
     selected: false,
     selectedStyle:
-      "col border border-dark shadow bg-success text-white mx-3 my-1 text-capitalize",
+      "col border border-dark shadow bg-success text-white m-1 text-capitalize",
     event: "rewk",
     openModal: true,
     disabled: false,
@@ -214,10 +214,10 @@ export const outJson = [
   {
     type: "not out",
     style:
-      "col border border-dark shadow bg-white mx-3 my-1 text-capitalize text-dark",
+      "col border border-dark shadow bg-white m-1 text-capitalize text-dark",
     selected: false,
     selectedStyle:
-      "col border border-dark shadow bg-success text-white mx-3 my-1 text-capitalize",
+      "col border border-dark shadow bg-success text-white m-1 text-capitalize",
     event: "",
     openModal: false,
     disabled: false,
