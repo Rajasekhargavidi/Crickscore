@@ -309,7 +309,6 @@ export const addScoreToMatch = (score, whichCollection) => {
 export const getTeamPlayers = (teamId, teamAction) => {
   return (dispatch, getState, { getFirebase, getFirestore }) => {
     const firestore = getFirestore();
-
     firestore
       .collection("teams")
       .doc(teamId)
@@ -320,7 +319,6 @@ export const getTeamPlayers = (teamId, teamAction) => {
           let teamData = [];
           somedoc.forEach(snapshot => {
             let teamSingleData = snapshot.data();
-
             teamData.push(teamSingleData);
           });
           if (teamAction === "batting") {

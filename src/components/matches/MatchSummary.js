@@ -45,9 +45,11 @@ const MatchSummary = ({ match, auth }) => {
         >
           View Score
         </Link>
-        <Link to={url} className="float-right btn btn-primary btn-sm">
-          Start Scoring
-        </Link>
+        {auth.uid === match.scorerId && (
+          <Link to={url} className="float-right btn btn-primary btn-sm">
+            Start Scoring
+          </Link>
+        )}
       </div>
     </div>
   );

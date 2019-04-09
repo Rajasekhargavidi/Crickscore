@@ -13,7 +13,27 @@ const SignedInLinks = ({ auth, signOut, user }) => {
       </li>
       <li className="nav-item active">
         <NavLink to="/matches" className="nav-link">
-          All Matches
+          Matches
+        </NavLink>
+      </li>
+      <li className="nav-item active">
+        <NavLink to="/matches" className="nav-link">
+          Players
+        </NavLink>
+      </li>
+      <li className="nav-item active">
+        <NavLink to="/matches" className="nav-link">
+          Teams
+        </NavLink>
+      </li>
+      <li className="nav-item active">
+        <NavLink to="/matches" className="nav-link">
+          Tournaments
+        </NavLink>
+      </li>
+      <li className="nav-item active">
+        <NavLink to="/matches" className="nav-link">
+          Users
         </NavLink>
       </li>
       <li className="nav-item active">

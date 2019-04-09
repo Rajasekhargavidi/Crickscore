@@ -44,7 +44,6 @@ class Console extends Component {
     whoIsOut: {},
     bowlerModal: false,
     batsmanModal: false,
-    initialPlayersModal: false,
     outModal: false,
     ER: runsJson,
     EE: extrasJson,
@@ -68,13 +67,22 @@ class Console extends Component {
         bowlingTeam,
         battingTeamId,
         bowlingTeamId;
+      if (
+        currentMatch[0].firstInningsWickets === currentMatch[0].players - 1 &&
+        currentMatch[0].currentInnings === "FIRST_INNINGS"
+      ) {
+        this.handleInnings();
+      } else if (
+        currentMatch[0].secondInningsWickets === currentMatch[0].players - 1 &&
+        currentMatch[0].currentInnings === "SECOND_INNINGS"
+      ) {
+        this.handleEndMatch();
+      }
       if (currentMatch[0].currentInnings === "SECOND_INNINGS") {
         battingTeamId = currentMatch[0].secondBattingId;
         bowlingTeamId = currentMatch[0].secondBowlingId;
         battingTeam = currentMatch[0].secondBatting;
         bowlingTeam = currentMatch[0].secondBowling;
-        this.props.getTeamPlayers(bowlingTeamId, "bowling");
-        this.props.getTeamPlayers(battingTeamId, "batting");
         bowlingCollection = "secondInningsBowling";
         battingCollection = "secondInningsBatting";
         scoreCollection = "secondInningsScore";
@@ -83,8 +91,6 @@ class Console extends Component {
         bowlingTeamId = currentMatch[0].firstBowlingId;
         battingTeam = currentMatch[0].firstBatting;
         bowlingTeam = currentMatch[0].firstBowling;
-        this.props.getTeamPlayers(bowlingTeamId, "bowling");
-        this.props.getTeamPlayers(battingTeamId, "batting");
         bowlingCollection = "firstInningsBowling";
         battingCollection = "firstInningsBatting";
         scoreCollection = "firstInningsScore";
@@ -98,6 +104,8 @@ class Console extends Component {
         battingTeamId,
         bowlingTeamId
       });
+      this.props.getTeamPlayers(bowlingTeamId, "bowling");
+      this.props.getTeamPlayers(battingTeamId, "batting");
     }
     if (score !== prevProps.score) {
       if (score) {
@@ -158,7 +166,6 @@ class Console extends Component {
       whoIsOut: {},
       bowlerModal: false,
       batsmanModal: false,
-      initialPlayersModal: false,
       outModal: false,
       ER: this.handleUIReset(this.state.ER),
       EE: this.handleUIReset(this.state.EE),
@@ -352,8 +359,19 @@ class Console extends Component {
       };
       this.props.addScoreToMatch(payload, scoreCollection);
       this.handleSubmitUI();
-      if (currentBall === parseInt(currentMatch[0].overs) * 6 && !extra) {
+      if (
+        currentBall === parseInt(currentMatch[0].overs) * 6 &&
+        !extra &&
+        currentMatch[0].currentInnings === "FIRST_INNINGS"
+      ) {
         this.handleInnings();
+      }
+      if (
+        currentBall === parseInt(currentMatch[0].overs) * 6 &&
+        !extra &&
+        currentMatch[0].currentInnings === "SECOND_INNINGS"
+      ) {
+        this.handleEndMatch();
       }
     }
   };
@@ -411,46 +429,32 @@ class Console extends Component {
   };
   handleInitialPlayers = (e, striker, nonStriker, bowler) => {
     e.preventDefault();
-
     this.props.addPlayers(striker, nonStriker, bowler);
-    this.setState(prevState => ({
-      initialPlayersModal: !prevState.initialPlayersModal
-    }));
   };
   handleInnings = () => {
     const { currentMatch } = this.props;
     let match = {
       ...currentMatch[0],
-      statusType: 3,
-      status: "INNINGS_BREAK",
+      status: 3,
+      statusType: "INNINGS_BREAK",
       currentInnings: "SECOND_INNINGS",
       initialPlayersNeeded: true
     };
     this.props.updateMatch(match);
+    this.props.history.push("/");
   };
   handleEndMatch = () => {
     const { currentMatch } = this.props;
     let match = {
       ...currentMatch[0],
-      statusType: 4,
-      status: "MATCH_ENDED",
-      currentInnings: "SECOND_INNINGS",
-      initialPlayersNeeded: false
+      status: 4,
+      statusType: "MATCH_ENDED",
+      currentInnings: "SECOND_INNINGS"
     };
     this.props.updateMatch(match);
+    this.props.history.push("/");
   };
 
-  handleEndMatch = () => {
-    const { currentMatch } = this.props;
-    let match = {
-      ...currentMatch[0],
-      statusType: 5,
-      status: "MATCH_ENDED",
-      currentInnings: "SECOND_INNINGS",
-      initialPlayersNeeded: false
-    };
-    this.props.updateMatch(match);
-  };
   lastSixBalls = lastSixBalls =>
     lastSixBalls.length !== 0 &&
     lastSixBalls.map((ball, i) => (
@@ -476,11 +480,7 @@ class Console extends Component {
       batsmanModal: !prevState.batsmanModal
     }));
   };
-  toggleInitialPlayersModal = () => {
-    this.setState(prevState => ({
-      initialPlayersModal: !prevState.initialPlayersModal
-    }));
-  };
+
   render() {
     const {
       currentMatch,
@@ -505,7 +505,6 @@ class Console extends Component {
       battingTeamId,
       bowlingTeam,
       bowlingTeamId,
-      initialPlayersModal,
       error
     } = this.state;
     if (!auth.uid) {
@@ -716,7 +715,6 @@ class Console extends Component {
             {/* modals */}
             <BowlerModal
               openModal={bowlerModal}
-              toggle={this.toggle}
               submitBowler={this.handleChangeBowler}
               bowlingSquad={bowlingSquad}
               bowlingTeam={bowlingTeam}
@@ -731,7 +729,6 @@ class Console extends Component {
             />
             <BatsmanModal
               openModal={batsmanModal}
-              toggle={this.toggleBatsmanModal}
               submitBatsman={this.handleChangeBatsman}
               battingSquad={battingSquad}
               battingTeam={battingTeam}
@@ -784,7 +781,6 @@ const mapStateToProps = state => {
     }
     if (!currentMatch[0].initialPlayersNeeded && score) {
       score = score[0];
-
       striker = score.striker;
       bowler = score.bowler;
       nonStriker = score.nonStriker;
