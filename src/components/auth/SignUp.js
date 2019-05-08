@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Redirect } from "react-router-dom";
+import { Redirect,Link } from "react-router-dom";
 import { connect } from "react-redux";
 import { signUp } from "../../store/actions/auth";
 
@@ -98,6 +98,8 @@ class SignUp extends Component {
               <Button color="success">Register</Button>
             </Col>
           </FormGroup>
+          <Link to="/SignIn" >Already have an account</Link>
+          
         </Form>
       </div>
     );

@@ -10,6 +10,7 @@ import Console from "./components/scorecard/Console";
 import FullScorecard from "./components/scorecard/FullScorecard";
 import SignIn from "./components/auth/Signin";
 import SignUp from "./components/auth/SignUp";
+import Tournment from './components/landing/Tournment'
 
 class App extends Component {
   render() {
@@ -19,6 +20,7 @@ class App extends Component {
           <Navbar />
           <Switch>
             <Route exact path="/" component={Home} />
+            <Route exact path="/" component={Tournment} />
             <Route path="/signin" component={SignIn} />
             <Route path="/signup" component={SignUp} />
             <Route path="/newMatch" component={NewMatch} />
