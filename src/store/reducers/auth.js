@@ -1,6 +1,7 @@
 const initialState = {
   signUpError: "",
-  signInError: ""
+  signInError: "",
+  createTeamError: ""
 };
 const auth = (state = initialState, action) => {
   switch (action.type) {
@@ -10,10 +11,14 @@ const auth = (state = initialState, action) => {
       return { ...state, signUpError: "" };
     case "SIGNUP_SUCCESS":
       return { ...state, signUpError: "" };
+    case "CREATETEAM_SUCCESS":
+      return { ...state, createTeamError: "" };
     case "SIGNUP_ERROR":
       return { ...state, signUpError: action.error };
     case "SIGNIN_ERROR":
       return { ...state, signInError: action.error };
+    case "CREATETEAM_ERROR":
+      return { ...state, createTeamError: action.error };
     default:
       return state;
   }

@@ -2,8 +2,9 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import { connect } from "react-redux";
 import { signOut } from "../../store/actions/auth";
+import { createTeam } from '../../store/actions/auth';
 
-const SignedInLinks = ({ auth, signOut, user }) => {
+const SignedInLinks = ({ auth, signOut, createTeam, user }) => {
   return (
     <ul className="navbar-nav mr-auto">
       <li className="nav-item active">
@@ -27,7 +28,7 @@ const SignedInLinks = ({ auth, signOut, user }) => {
         </NavLink>
       </li>
       <li className="nav-item active">
-        <NavLink to="/matches" className="nav-link">
+        <NavLink to="/createTeam" className="nav-link">
           Tournaments
         </NavLink>
       </li>
@@ -41,6 +42,7 @@ const SignedInLinks = ({ auth, signOut, user }) => {
           Logout
         </a>
       </li>
+      
       <li className="nav-item active">
         <NavLink to="/" className="btn btn-danger">
           {user && user.initials}

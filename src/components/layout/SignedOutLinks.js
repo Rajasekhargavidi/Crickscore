@@ -18,6 +18,11 @@ const SignedOutLinks = () => {
         <NavLink to="/signup" className="nav-link">
           Register
         </NavLink>
+        </li>
+        <li className="nav-item active">
+        <NavLink to="/Tournaments" className="nav-link">
+          Tournaments
+        </NavLink>
       </li>
     </ul>
   );

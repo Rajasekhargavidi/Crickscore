@@ -47,3 +47,38 @@ export const signOut = () => {
       .catch(err => console.log(err));
   };
 };
+
+export const createTeam =(newTeam) => {
+  return (dispatch,getState, { getFirebase, getFirestore }) => {
+    const firestore = getFirestore;
+    const firebase = getFirebase();
+    firebase
+      .auth()
+      .saveTournamentWithTeamDetails(newTeam.name,
+             newTeam.startDate,
+             newTeam.Fee,
+             newTeam.firstPrize,
+             newTeam.secondPrize,
+             newTeam.sponsors,
+             newTeam.totalteams)
+      .then(response => {
+      return firestore
+          .collection("users")
+          .doc(response.user.uid)
+          .set({
+            Name: newTeam.firstName,
+            startDate: newTeam.startDate,
+            fee: newTeam.fee,
+            firstPrize: newTeam.firstPrize,
+            secondPrize: newTeam.secondPrize,
+            sponsors: newTeam.sponsors,
+            totalteams:newTeam.totalteams
+          });
+      })
+      .then(() => {
+        dispatch({ type: "" });
+      })
+      .catch(err => dispatch({ type: "SIGNUP_ERROR", error: err.message }));
+  };
+};
+
